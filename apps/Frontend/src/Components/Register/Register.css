@@ -12,7 +12,6 @@ body {
   padding: 0;
   width: 100%;
   background: linear-gradient(135deg, #1198B7, #0f7f99);
-  gap: 20px;
 }
 
 /* card */
@@ -21,6 +20,7 @@ body {
   min-height: 100vh;
   margin: 0;
   border-radius: 0px; /* مهم عشان full screen */
+  gap: 20px;
 }
 
 /* LEFT */
