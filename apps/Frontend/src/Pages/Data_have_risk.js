@@ -1,6 +1,5 @@
 import React from "react";
 import "../Pages/Data_have_risk.css";
-import "../bootstrap.min.css";
 import "../fontawesome-free-7.0.0-web/css/all.min.css";
 import profile from "../Image/profile.png";
 import effect from "../Image/The_most_factor.jpg";

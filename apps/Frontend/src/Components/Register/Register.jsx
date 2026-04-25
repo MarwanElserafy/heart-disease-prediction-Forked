@@ -9,11 +9,11 @@ const Register = () => {
   return (
     <div className="container-fluid register-container p-0">
 
-      <div className="row register-card w-100  ming-1">
+      <div className="row register-card w-10 g-4 ">
 
         {/* LEFT SIDE */}
         <div
-          className="col-lg-5 col-12 left-side"
+          className="col-lg-4 col-12 left-side"
           style={{
             backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url(${heartImg})`,
             backgroundSize: "cover",
@@ -27,11 +27,11 @@ const Register = () => {
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="col-lg-7 col-12 right-side">
+        <div className="col-lg-8 col-12 right-side">
 
           <div className="register-content">
 
-            <h2>Register Page</h2>
+            <h2>egister Page</h2>
 
             <div className="input-group">
               <input type="email" placeholder="Email" />
@@ -67,7 +67,7 @@ const Register = () => {
         </div>
 
       </div>
-    </div>
+    // </div>
   );
 };
 

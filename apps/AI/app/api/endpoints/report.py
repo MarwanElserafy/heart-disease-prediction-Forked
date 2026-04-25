@@ -108,32 +108,50 @@ def get_prediction_report(id: int, db: Session = Depends(get_db)):
         patient.decision        = assessment.decision.value
         db.commit()
 
-    # ── 6. Build HTML context ─────────────────────────────────────────────
-    # font_path needed by xhtml2pdf to load the Amiri Arabic font
-    assets_dir = Path(__file__).resolve().parent.parent.parent.parent / "app" / "assets" / "fonts" / ""
-    context = {
-        "patient_info":    patient_info,
-        "probability":     round(assessment.probability_pct, 1),
-        "decision":        assessment.decision.value,           # "low" | "high"
-        "ui_risk_level":   assessment.risk_level.value,        # display badge
-        "ui_risk_color":   assessment.risk_color,              # hex
-        "feat_chart_b64":  feat_chart,
-        "shap_chart_b64":  shap_chart,
-        "explanation":     llm_result.get("explanation", ""),
-        "recommendations": llm_result.get("recommendations", []),
-        "generated_at":    datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "font_path":       str(assets_dir).replace("\\", "/") + "/",
+    # ── 6. Build Context for PDF Service ──────────────────────────────────
+    from services.report.pdf_service import generate_medical_report_pdf
+
+    patient_data = {
+        "name": "Anonymous",
+        "gender": "Male" if patient.sex == 1 else "Female",
+        "dob": "N/A",
+        "national_id": "N/A",
+        "address": "N/A",
+        "age": patient.age,
+        "cp": patient.chest_pain_type,
+        "trestbps": patient.resting_bp_s,
+        "chol": patient.cholesterol,
+        "fbs": patient.fasting_blood_sugar,
+        "restecg": patient.resting_ecg,
+        "thalach": patient.max_heart_rate,
+        "exang": "Yes" if patient.exercise_angina == 1 else "No",
+        "oldpeak": patient.oldpeak,
+        "slope": patient.ST_slope,
     }
 
-    # ── 7. Render HTML → PDF ──────────────────────────────────────────────
-    from services.report import renderer as _renderer
-    from services.report import pdf_exporter as _pdf_exporter
+    risk_score = round(assessment.probability_pct, 1)
 
-    html      = _renderer.render_report(context)
-    pdf_bytes = _pdf_exporter.html_to_pdf(html)
+    llm_report = {
+        "summary": llm_result.get("explanation", ""),
+        "recommendations": llm_result.get("recommendations", [])
+    }
+
+    images_base64 = {
+        "university_logo": "",  # Placeholder for missing logo
+        "risk_gauge": feat_chart,
+        "shap_plot": shap_chart
+    }
+
+    # ── 7. Render HTML → PDF using WeasyPrint ────────────────────────────
+    pdf_bytes_io = generate_medical_report_pdf(
+        patient_data=patient_data,
+        risk_score=risk_score,
+        llm_report=llm_report,
+        images_base64=images_base64
+    )
 
     return Response(
-        content=bytes(pdf_bytes),
+        content=pdf_bytes_io.getvalue(),
         media_type="application/pdf",
         headers={
             "Content-Disposition": f"attachment; filename=artemis_report_patient_{id}.pdf"
