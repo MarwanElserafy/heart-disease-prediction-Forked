@@ -1,7 +1,6 @@
 import React from "react";
 import "../Pages/The_General_Home_Page.css";
 import "../fontawesome-free-7.0.0-web/css/all.min.css";
-import "../bootstrap.min.css";
 import profile from "../Image/profile.png";
 import logo from "../Image/logo.png";
 import nabd from "../Image/nabd.png";
