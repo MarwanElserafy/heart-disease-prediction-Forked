@@ -1,0 +1,65 @@
+.page {
+  min-height: 100vh;
+  background: #ffffff;
+}
+.main {
+  min-height: 100vh;
+} /* logo */
+.brand-name {
+  color: var(--text-title);
+}
+.nav-item {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-title);
+}
+.brand {
+  font-family: "Arial Narrow Bold", sans-serif;
+  font-weight: bold;
+  color: rgb(33, 68, 75);
+}
+nav li {
+  color: #0f3d4c;
+}
+.logo {
+  width: 40px;
+}
+.profile {
+  width: 25px;
+} /* تخلي اللينكات تبقى واضحة */
+.nav-link {
+  color: #0f3d4c !important;
+  font-weight: 500;
+} /* لما الشاشة تصغر */
+@media (max-width: 991px) {
+  .navbar-nav {
+    margin-top: 15px;
+  }
+}
+.custom-btn {
+  background-color: #77bac5 !important;
+  border: none;
+  color: #fff !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-right: 5px;
+  letter-spacing: 3%;
+  font-family: sans-serif;
+}
+.custom-btn:hover {
+  background-color: #0f86a3 !important;
+  box-shadow: 0 6px 15px rgba(17, 152, 183, 0.35);
+  transform: translateY(-1px);
+} /* للزرار الفاضي */
+.custom-btn-outline {
+  background-color: transparent;
+  border: 1.5px solid #1198b7 !important;
+  color: #1198b7;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.custom-btn-outline:hover {
+  background-color: #1198b7 !important;
+  color: #fff !important;
+  box-shadow: 0 6px 15px rgba(17, 152, 183, 0.25);
+} /* hero section */

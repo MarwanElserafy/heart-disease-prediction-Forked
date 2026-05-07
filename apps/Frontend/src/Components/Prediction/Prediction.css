@@ -33,7 +33,7 @@ body {
 
 /* TITLE */
 .prediction-card h1 {
-  font-weight: 600;
+  font-weight: 800;
   font-size: 48px;
   letter-spacing: 0.08em;
   margin-bottom: 15px;
@@ -342,5 +342,91 @@ color: transparent;
   .lab-card {
     max-width: 100%;
     height: auto;
+  }
+}
+@media (max-width: 1024px) {
+
+  .prediction-card h1 {
+    font-size: 36px;
+    letter-spacing: 0.05em;
+  }
+
+  .subtitle {
+    font-size: 24px;
+  }
+
+  .report-title {
+    font-size: 28px;
+  }
+
+  .info-text {
+    font-size: 26px;
+  }
+
+  .report-box {
+    width: 75%;
+    padding: 30px;
+  }
+
+  .labs-title {
+    font-size: 32px;
+    width: auto;
+    height: auto;
+  }
+
+  .labs-sub {
+    font-size: 32px;
+  }
+}@media (max-width: 768px) {
+
+  .prediction-page {
+    padding: 60px 15px;
+    align-items: flex-start;
+  }
+
+  .prediction-card h1 {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    line-height: 26px;
+  }
+
+  .prediction-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .report-title {
+    font-size: 22px;
+  }
+
+  .highlight {
+    font-size: 16px;
+  }
+
+  .report-box {
+    width: 95%;
+    padding: 20px;
+    border-radius: 25px;
+  }
+
+  .labs-title {
+    font-size: 24px;
+    width: auto;
+    height: auto;
+  }
+
+  .labs-sub {
+    font-size: 20px;
+  }
+
+  .info-text {
+    font-size: 20px;
   }
 }

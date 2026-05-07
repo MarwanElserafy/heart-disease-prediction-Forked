@@ -1,6 +1,7 @@
 import React from "react";
 import "../Pages/Have_no_risk.css";
 import profile from "../Image/profile.png";
+import Navbar from "../Components/Navbar/Navbar";
 import logo from "../Image/logo.png";
 import { Link } from "react-router-dom";
 function Home() {

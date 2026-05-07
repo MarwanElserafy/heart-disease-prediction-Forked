@@ -1,11 +1,96 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Login.css";
 import heartImg from "../../assets/heartLog.png";
 import logo from "../../assets/Logo.png";
 import { FaUser, FaLock } from "react-icons/fa";
-import { Link } from "react-router-dom";
 
-const Login = () => {
+import { Link, useNavigate } from "react-router-dom";
+
+  const Login = () => {
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+
+  // ✅ validation
+  const validate = (name, value) => {
+    let error = "";
+
+    if (name === "email") {
+      if (!value) {
+        error = "Email is required";
+      } else if (!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(value)) {
+        error = "Invalid email format";
+      }
+    }
+
+    if (name === "password") {
+      if (!value) {
+        error = "Password is required";
+      }
+    }
+
+    return error;
+  };
+
+  // onChange
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setForm({ ...form, [name]: value });
+
+    const error = validate(name, value);
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+  };
+
+  // onBlur
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+
+    const error = validate(name, value);
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+  };
+
+  // submit
+  const handleLogin = () => {
+    const emailError = validate("email", form.email);
+    const passwordError = validate("password", form.password);
+
+    if (emailError || passwordError) {
+      setErrors({
+        email: emailError,
+        password: passwordError,
+      });
+      return;
+    }
+
+    // 🔴 هنا الباك إند بعدين
+    /*
+    لو الباسورد غلط:
+    setErrors({ password: "Incorrect password" });
+
+    لو الإيميل مش موجود:
+    setErrors({ email: "User not found" });
+    */
+
+    // ✅ مؤقت
+    localStorage.setItem("user", "true");
+    localStorage.setItem("type", "risk");
+
+    navigate("/the_general");
+  };
+
   return (
     <div className="login-container">
 

@@ -1,55 +1,130 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../Image/logo.png";
-import profileImg from "../../Image/profile.png"; // عدلي المسار حسب عندك
+import profile from "../../Image/profile.png";
+import "./Navbar.css";
 
-const Navbar = () => {
-  // مؤقت لحد ما الباك يجهز
-  const [isLoggedIn] = useState(false);
+export default function Navbar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // ✅ state تسجيل الدخول
+  const [isLogged, setIsLogged] = useState(false);
+
+  // ✅ تحديد الصفحات
+  const isProfilePage = location.pathname === "/profile";
+
+  // ✅ check login
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    setIsLogged(!!user);
+  }, [location.pathname]);
+
+  // ✅ logout
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsLogged(false);
+    navigate("/home");
+  };
 
   return (
-    <nav className="navbar px-5 py-2 mx-auto">
+    <nav className="navbar navbar-expand-lg px-4 py-2">
+      {/* Logo */}
 
-      {/* Logo + Brand */}
       <div className="d-flex align-items-center gap-2">
         <img src={logo} className="logo" alt="logo" />
         <span className="brand">Heart Diseases</span>
       </div>
 
-      {/* Links */}
-      <ul className="nav mx-auto gap-4">
-        <li>HOME</li>
-        <li>DOCS</li>
-        <li>HEART</li>
-        <li>ABOUT</li>
-      </ul>
 
-      {/* Buttons */}
-      <div className="hero-buttons d-flex gap-2">
+      {/* Toggle */}
+      <button
+        className="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarContent"
+      >
+        <span className="navbar-toggler-icon"></span>
+      </button>
 
-        {!isLoggedIn ? (
-          <>
-            <Link to="/login" className="btn custom-btn-outline">
-              Login
+      {/* Content */}
+      <div
+        className="collapse navbar-collapse justify-content-between"
+        id="navbarContent"
+      >
+        {/* Links */}
+        <ul className="navbar-nav mx-auto text-center gap-lg-4">
+          <li className="nav-item">
+            <Link className="nav-link" to="/home">
+              HOME
             </Link>
-
-            <Link to="/register" className="btn custom-btn">
-              Register
+          </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/docs">
+              DOCS
             </Link>
-          </>
-        ) : (
-          <Link
-            to="/profile"
-            className="btn learn btn-outline-dark rounded-pill custom-btn d-flex align-items-center gap-2"
-          >
-            My Profile
-            <img src={profileImg} className="profile" alt="profile" />
-          </Link>
-        )}
+          </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/heart">
+              HEART
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/about">
+              ABOUT
+            </Link>
+          </li>
+        </ul>
 
+        {/* Buttons */}
+        <div className="d-flex justify-content-center gap-2 mt-3 mt-lg-0">
+          {/* ❌ لو مش عامل login */}
+          {!isLogged ? (
+            <>
+              <button
+                onClick={() => navigate("/register")}
+                className="custom-btn rounded-pill px-4 py-2"
+              >
+                Register
+              </button>
+
+              <button
+                onClick={() => navigate("/login")}
+                className="custom-btn rounded-pill px-4 py-2"
+              >
+                Login
+              </button>
+            </>
+          ) : isProfilePage ? (
+            /* ✅ لو في صفحة البروفايل */
+            <button
+              onClick={handleLogout}
+              className="custom-btn-outline rounded-pill px-4 py-2"
+            >
+              Logout
+            </button>
+          ) : (
+            /* ✅ باقي الصفحات */
+            <>
+              <button
+                onClick={() => navigate("/profile")}
+                className="custom-btn rounded-pill px-2"
+              >
+                My Profile
+                <img src={profile} className="profile" alt="profile" />
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="custom-btn-outline rounded-pill px-4 py-2"
+              >
+                Log out
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );
-};
+}
 
-export default Navbar;

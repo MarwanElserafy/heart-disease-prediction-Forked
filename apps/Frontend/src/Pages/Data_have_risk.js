@@ -56,27 +56,29 @@ function Home() {
             The Most Effected Factor In The Result{" "}
           </h3>{" "}
           <img className="effect-img" src={effect} />{" "}
-          <h3 className="cap-effect">
-            {" "}
-            You should Go To One Of These Hospitals <br /> That Specialize In
-            Heart Diseases.{" "}
-          </h3>{" "}
+          
         </div>{" "}
       </section>{" "}
       {/* Hospitals Section */}
       <section className="hospitals-section">
+        <h3 className="cap-effect">
+            {" "}
+            You should Go To One Of These Hospitals <br /> That Specialize In
+            Heart Diseases.{" "}
+          </h3>{" "}
         {/* Alexandria */}
-        <div className="city-title position-relative">
-          <h5 className="city-tittle">Alexandria</h5>
-        </div>
+        <div className="city-box position-relative">
+  <h5 className="city-title">Alexandria</h5>
+</div>
+
         <div className="hospitals-container">
           <div>
-            <a
-              href="https://www.google.com/maps?q=31.1716947,29.9435354"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hospital-card me-2 "
-            >
+           <a
+            href="https://www.google.com/maps/place/Elite+Hospital/@31.1716947,29.9435354,17z/data=!3m1!4b1!4m6!3m5!1s0x14f5c310e1d19295:0xc973dcd1396e7e2c!8m2!3d31.1716947!4d29.9435354!16s%2Fg%2F11c2090xx7?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hospital-card me-2"
+           >
               <p className="hospital-name text-center">Elite Hospital</p>
               <div className="d-flex align-items-center justify-content-center gap-2  mb-2 location">
                 <img src={location_icon} className="location_icon" />
@@ -133,9 +135,9 @@ function Home() {
         </div>
 
         {/* Cairo */}
-        <div className="city-title position-relative px-5">
-          <h5 className="city-tittle">Cairo</h5>
-        </div>
+       <div className="city-box position-relative">
+  <h5 className="city-title">Cairo</h5>
+</div>
 
         <div className="hospitals-container">
           <div>

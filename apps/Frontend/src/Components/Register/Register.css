@@ -1,125 +1,243 @@
-body {
+
+/* ===== GLOBAL ===== */
+
+*{
   margin: 0;
-  font-family: sans-serif;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* container */
-.register-container {
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  background: transparent;
+}
+/* ===== PAGE ===== */
+
+.register-page{
+  width: 100%;
   min-height: 100vh;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0;
-  width: 100%;
-  background: linear-gradient(135deg, #1198B7, #0f7f99);
-}
 
-/* card */
-.register-card {
-  width: 100vw;
-  min-height: 100vh;
   margin: 0;
-  border-radius: 0px; /* مهم عشان full screen */
-  gap: 20px;
+  padding: 0;
 }
 
-/* LEFT */
-.left-side {
+/* ===== CARD ===== */
+
+.register-card{
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  gap: 8px;
+
+  background: linear-gradient(135deg, #1198B7, #0f7f99);
+
+  overflow: hidden;
+}
+/* ===== LEFT IMAGE SIDE ===== */
+
+.register-image-side{
+  width: 35%;
+
+  background-size: cover;
+  background-position: center;
+
+  position: relative;
+
   display: flex;
   align-items: flex-start;
-  padding: 40px;
+
+  padding: 25px;
   border-radius: 10px;
-  
 }
 
-/* logo */
-.logo-title-wrapper {
-  display: flex;
+/* ===== BRAND ===== */
+
+.brand{
+   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.logo {
-  width: 50px;
-}
-
-.logo-title-wrapper h1 {
+.brand h1{
   font-size: 28px;
   font-weight: 800;
   color: #0f4c5c;
+
 }
 
-/* RIGHT */
-.right-side {
-  background: #f5f9ff;
+.brand-logo{
+  width: 50px;
+}
+
+/* ===== RIGHT FORM SIDE ===== */
+
+.register-form-side{
+  width: 65%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f5f8fc,
+      #edf2f7
+    );
+
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px;
+
+  position: relative;
   border-radius: 10px;
 }
 
-/* form */
-.register-content {
-  width: 100%;
-  max-width: 360px;
-}
+/* light blur effect */
+.register-form-side::before{
+  content: "";
 
-.register-content h2 {
-  text-align: center;
-  margin-bottom: 25px;
-  font-size: 32px;
-  color: #0f4c5c;
-}
-
-/* inputs */
-.input-group {
-  position: relative;
-  margin-bottom: 20px;
-}
-
-.input-group input {
-  width: 100%;
-  height: 45px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 0 40px 0 10px;
-  outline: none;
-}
-
-/* icons */
-.input-icon {
   position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: gray;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(17,152,183,0.18),
+      transparent 45%
+    );
 }
 
-/* button */
-.btn-gradient {
-  width: 100%;
-  height: 45px;
-  border: none;
-  border-radius: 8px;
-  background: #1198B7;
-  color: white;
+/* ===== FORM ===== */
+
+.form-content{
+  width: 320px;
+  position: relative;
+  z-index: 2;
 }
 
-.btn-gradient:hover {
-  background: #0f7f99;
-}
-
-/* link */
-.login-link {
+.form-content h2{
   text-align: center;
-  margin-top: 15px;
-  color: #7a8a99;
+
+  color: #21596a;
+
+  font-size: 28px;
+  font-weight: 700;
+
+  margin-bottom: 35px;
 }
 
-.login-link a {
+/* ===== INPUT ===== */
+
+.input-group{
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.input-group input{
+  width: 100%;
+  height: 42px;
+
+  border: 1px solid #9aa8b1;
+  border-radius: 6px;
+
+  padding: 0 40px 0 14px;
+
+  background: transparent;
+
+  outline: none;
+
+  font-size: 14px;
+}
+
+.input-group input:focus{
+  border-color: #1198B7;
+}
+
+.input-icon{
+  position: absolute;
+
+  right: 14px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #50636d;
+  font-size: 14px;
+}
+
+/* ===== BUTTON ===== */
+
+.create-btn{
+  width: 100%;
+  height: 42px;
+
+  border: none;
+  border-radius: 6px;
+
+  margin-top: 10px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #33b7d3,
+      #1198B7
+    );
+
+  color: white;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.create-btn:hover{
+  transform: translateY(-1px);
+}
+
+/* ===== LOGIN ===== */
+
+.login-text{
+  margin-top: 14px;
+
+  text-align: center;
+
+  font-size: 13px;
+  color: #6d6d6d;
+}
+
+.login-text a{
   color: #1198B7;
   text-decoration: none;
+  font-weight: 600;
 }
 
-/* IMPORTANT: no media queries needed */
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 950px){
+
+  .register-card{
+    width: 100%;
+    height: auto;
+
+    flex-direction: column;
+  }
+
+  .register-image-side{
+    width: 100%;
+    height: 260px;
+  }
+
+  .register-form-side{
+    width: 100%;
+    padding: 50px 20px;
+  }
+
+  .page-title{
+    font-size: 30px;
+  }
+}
