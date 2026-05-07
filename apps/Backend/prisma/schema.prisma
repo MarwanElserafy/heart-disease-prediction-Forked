@@ -45,14 +45,31 @@ model LabTest {
   exercise_angina       Int
   oldpeak               Float
   st_slope              Int
-  prediction_result     String?
-  prediction_percentage Float?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+  
   lab                   Lab      @relation(fields: [lab_id], references: [id], onDelete: Cascade)
+  prediction            Prediction?
 
   @@index([national_id])
   @@map("lab_tests")
+}
+
+model Prediction {
+  id                    String   @id @default(cuid())
+  lab_test_id           String   @unique
+  prediction_result     Int?     
+  prediction_percentage Float?
+  risk_level            String?
+  decision              String?
+  shap_image            Bytes?
+  llm_report_json       Json?
+  createdAt             DateTime? @default(now())
+  updatedAt             DateTime? @updatedAt
+  
+  labTest               LabTest  @relation(fields: [lab_test_id], references: [id], onDelete: Cascade)
+
+  @@map("predictions")
 }
 
 model Hospital {

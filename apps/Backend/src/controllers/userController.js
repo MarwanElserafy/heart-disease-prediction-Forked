@@ -1,15 +1,8 @@
-const express = require("express");
 const bcrypt = require("bcrypt");
 const prisma = require("../config/prisma");
-const { validate } = require("../middleware/validate");
-const { handlePrismaError } = require("../middleware/prismaErrors");
-const { userCreateSchema, userUpdateSchema } = require("../schemas/user.schema");
-const { authenticate } = require("../middleware/auth");
+const { handlePrismaError } = require("../middlewares/prismaErrors");
 
-const router = express.Router();
-
-// Create new user (protected — admin only)
-router.post("/", authenticate, validate(userCreateSchema), async (req, res, next) => {
+const createUser = async (req, res, next) => {
   try {
     const { national_id, username, email, password } = req.body;
     const salt = await bcrypt.genSalt(10);
@@ -25,10 +18,9 @@ router.post("/", authenticate, validate(userCreateSchema), async (req, res, next
     if (handlePrismaError(err, res)) return;
     next(err);
   }
-});
+};
 
-// Get all users (with pagination)
-router.get("/", authenticate, async (req, res, next) => {
+const getUsers = async (req, res, next) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
@@ -55,10 +47,9 @@ router.get("/", authenticate, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Get single user by id
-router.get("/:id", authenticate, async (req, res, next) => {
+const getUserById = async (req, res, next) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.params.id },
@@ -72,10 +63,9 @@ router.get("/:id", authenticate, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Update user (protected)
-router.put("/:id", authenticate, validate(userUpdateSchema), async (req, res, next) => {
+const updateUser = async (req, res, next) => {
   try {
     const updateData = { ...req.body };
     if (updateData.password) {
@@ -97,10 +87,9 @@ router.put("/:id", authenticate, validate(userUpdateSchema), async (req, res, ne
     if (handlePrismaError(err, res)) return;
     next(err);
   }
-});
+};
 
-// Delete user (protected)
-router.delete("/:id", authenticate, async (req, res, next) => {
+const deleteUser = async (req, res, next) => {
   try {
     await prisma.user.delete({ where: { id: req.params.id } });
     res.json({ success: true, message: "User deleted successfully" });
@@ -108,6 +97,12 @@ router.delete("/:id", authenticate, async (req, res, next) => {
     if (handlePrismaError(err, res)) return;
     next(err);
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  createUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+};

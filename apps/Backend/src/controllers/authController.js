@@ -1,11 +1,6 @@
-const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const prisma = require("../config/prisma");
-const { validate } = require("../middleware/validate");
-const { userCreateSchema, userLoginSchema } = require("../schemas/user.schema");
-
-const router = express.Router();
 
 const generateToken = (userId) => {
   const secret = process.env.JWT_SECRET;
@@ -17,8 +12,7 @@ const generateToken = (userId) => {
   });
 };
 
-// Register new user
-router.post("/register", validate(userCreateSchema), async (req, res, next) => {
+const registerUser = async (req, res, next) => {
   try {
     const { national_id, username, email, password } = req.body;
 
@@ -41,7 +35,6 @@ router.post("/register", validate(userCreateSchema), async (req, res, next) => {
     });
 
     const token = generateToken(user.id);
-
     const { password: _, ...userWithoutPassword } = user;
 
     res.status(201).json({
@@ -53,10 +46,9 @@ router.post("/register", validate(userCreateSchema), async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Login user
-router.post("/login", validate(userLoginSchema), async (req, res, next) => {
+const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -80,7 +72,6 @@ router.post("/login", validate(userLoginSchema), async (req, res, next) => {
     }
 
     const token = generateToken(user.id);
-
     const { password: _, ...userWithoutPassword } = user;
 
     res.json({
@@ -92,6 +83,9 @@ router.post("/login", validate(userLoginSchema), async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  registerUser,
+  loginUser,
+};

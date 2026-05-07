@@ -54,7 +54,7 @@ def html_to_pdf(html: str) -> bytes:
         from reportlab.pdfbase.ttfonts import TTFont
 
         # Register Amiri Arabic font if available
-        _font_dir = _Path(__file__).resolve().parent.parent.parent.parent / "app" / "assets" / "fonts"
+        _font_dir = _Path(__file__).resolve().parent.parent.parent / "assets" / "fonts"
         _regular = _font_dir / "Amiri-Regular.ttf"
         _bold    = _font_dir / "Amiri-Bold.ttf"
         if _regular.exists():

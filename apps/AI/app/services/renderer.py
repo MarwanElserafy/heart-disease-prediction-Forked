@@ -10,7 +10,7 @@ No Arabic processing, no PDF logic, no LLM calls.
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-_TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
+_TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 
 _env = Environment(
     loader=FileSystemLoader(str(_TEMPLATE_DIR)),

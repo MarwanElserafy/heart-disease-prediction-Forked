@@ -20,10 +20,10 @@ logger = logging.getLogger(__name__)
 TEST_CASES_DIR = "data/synthetic_test_cases"
 TRUE_LABELS_PATH = os.path.join(TEST_CASES_DIR, "true_labels.csv")
 MODEL_PATHS = [
-    "AI/models/best_model.pkl",
-    "models/best_model.pkl",
-    "./AI/models/best_model.pkl",
-    "./models/best_model.pkl"
+    "AI/assets/best_model.pkl",
+    "assets/best_model.pkl",
+    "./AI/assets/best_model.pkl",
+    "./assets/best_model.pkl"
 ]
 
 

@@ -2,7 +2,7 @@ const path = require("path");
 const dotenv = require("dotenv");
 
 // يجب أن يكون dotenv أول سطر قبل أي require آخر
-dotenv.config({ path: path.join(__dirname, ".env") });
+dotenv.config({ path: path.join(__dirname, "..", ".env") });
 
 // تأكيد تحميل DATABASE_URL قبل إنشاء Prisma Client
 if (!process.env.DATABASE_URL) {
@@ -41,20 +41,13 @@ app.use("/api/labs", require("./routes/labRoute"));
 app.use("/api/labtests", require("./routes/labtestRoute"));
 app.use("/api/hospitals", require("./routes/hospitalRoute"));
 
+const { notFoundHandler, globalErrorHandler } = require("./middlewares/errorMiddleware");
+
 // 404 handler — must come before error handler
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: "Route not found" });
-});
+app.use(notFoundHandler);
 
 // Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-  });
-});
+app.use(globalErrorHandler);
 
 // Start server + connect to Neon PostgreSQL
 const PORT = process.env.PORT || 5000;

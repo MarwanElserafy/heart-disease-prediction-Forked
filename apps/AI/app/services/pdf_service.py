@@ -18,7 +18,7 @@ def generate_medical_report_pdf(patient_data, risk_score, llm_report, images_bas
     """
     # Get the directory where the templates are stored
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    templates_dir = os.path.join(current_dir, 'templates')
+    templates_dir = os.path.join(os.path.dirname(current_dir), 'templates')
 
     # Setup Jinja2 environment
     env = Environment(loader=FileSystemLoader(templates_dir))

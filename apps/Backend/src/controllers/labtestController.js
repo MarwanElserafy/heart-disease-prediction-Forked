@@ -1,15 +1,5 @@
-const express = require("express");
 const prisma = require("../config/prisma");
-const { validate } = require("../middleware/validate");
-const { handlePrismaError } = require("../middleware/prismaErrors");
-const {
-  labTestCreateSchema,
-  labTestUpdateSchema,
-  predictionUpdateSchema,
-} = require("../schemas/labtest.schema");
-const { authenticate } = require("../middleware/auth");
-
-const router = express.Router();
+const { handlePrismaError } = require("../middlewares/prismaErrors");
 
 // Helper: flatten features object into top-level Prisma fields
 const flattenFeatures = (body) => {
@@ -37,8 +27,7 @@ const shapeLabTest = (labTest) => {
 
 const labTestInclude = { lab: true };
 
-// Create new lab test (protected)
-router.post("/", authenticate, validate(labTestCreateSchema), async (req, res, next) => {
+const createLabTest = async (req, res, next) => {
   try {
     const data = flattenFeatures(req.body);
     const labTest = await prisma.labTest.create({
@@ -50,10 +39,9 @@ router.post("/", authenticate, validate(labTestCreateSchema), async (req, res, n
     if (handlePrismaError(err, res)) return;
     next(err);
   }
-});
+};
 
-// Get all lab tests (with pagination)
-router.get("/", async (req, res, next) => {
+const getLabTests = async (req, res, next) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
@@ -76,10 +64,9 @@ router.get("/", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Get single lab test by id
-router.get("/:id", async (req, res, next) => {
+const getLabTestById = async (req, res, next) => {
   try {
     const labTest = await prisma.labTest.findUnique({
       where: { id: req.params.id },
@@ -90,10 +77,9 @@ router.get("/:id", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Get all lab tests by national_id
-router.get("/patient/:national_id", async (req, res, next) => {
+const getLabTestsByNationalId = async (req, res, next) => {
   try {
     const labTests = await prisma.labTest.findMany({
       where: { national_id: req.params.national_id },
@@ -104,10 +90,9 @@ router.get("/patient/:national_id", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Get latest lab test by national_id
-router.get("/patient/:national_id/latest", async (req, res, next) => {
+const getLatestLabTestByNationalId = async (req, res, next) => {
   try {
     const labTest = await prisma.labTest.findFirst({
       where: { national_id: req.params.national_id },
@@ -119,10 +104,9 @@ router.get("/patient/:national_id/latest", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Get lab tests by lab_id
-router.get("/lab/:lab_id", async (req, res, next) => {
+const getLabTestsByLabId = async (req, res, next) => {
   try {
     const labTests = await prisma.labTest.findMany({
       where: { lab_id: req.params.lab_id },
@@ -133,10 +117,9 @@ router.get("/lab/:lab_id", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Update lab test (protected)
-router.put("/:id", authenticate, validate(labTestUpdateSchema), async (req, res, next) => {
+const updateLabTest = async (req, res, next) => {
   try {
     const data = flattenFeatures(req.body);
     const labTest = await prisma.labTest.update({
@@ -149,26 +132,9 @@ router.put("/:id", authenticate, validate(labTestUpdateSchema), async (req, res,
     if (handlePrismaError(err, res)) return;
     next(err);
   }
-});
+};
 
-// Update prediction result only (protected)
-router.patch("/:id/prediction", authenticate, validate(predictionUpdateSchema), async (req, res, next) => {
-  try {
-    const { prediction_result, prediction_percentage } = req.body;
-    const labTest = await prisma.labTest.update({
-      where: { id: req.params.id },
-      data: { prediction_result, prediction_percentage },
-      include: labTestInclude,
-    });
-    res.json({ success: true, data: shapeLabTest(labTest) });
-  } catch (err) {
-    if (handlePrismaError(err, res)) return;
-    next(err);
-  }
-});
-
-// Delete lab test (protected)
-router.delete("/:id", authenticate, async (req, res, next) => {
+const deleteLabTest = async (req, res, next) => {
   try {
     await prisma.labTest.delete({ where: { id: req.params.id } });
     res.json({ success: true, message: "Lab test deleted successfully" });
@@ -176,6 +142,15 @@ router.delete("/:id", authenticate, async (req, res, next) => {
     if (handlePrismaError(err, res)) return;
     next(err);
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  createLabTest,
+  getLabTests,
+  getLabTestById,
+  getLabTestsByNationalId,
+  getLatestLabTestByNationalId,
+  getLabTestsByLabId,
+  updateLabTest,
+  deleteLabTest,
+};

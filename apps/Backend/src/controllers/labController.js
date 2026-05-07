@@ -1,14 +1,7 @@
-const express = require("express");
 const prisma = require("../config/prisma");
-const { validate } = require("../middleware/validate");
-const { handlePrismaError } = require("../middleware/prismaErrors");
-const { labCreateSchema, labUpdateSchema } = require("../schemas/lab.schema");
-const { authenticate } = require("../middleware/auth");
+const { handlePrismaError } = require("../middlewares/prismaErrors");
 
-const router = express.Router();
-
-// Create new lab (protected)
-router.post("/", authenticate, validate(labCreateSchema), async (req, res, next) => {
+const createLab = async (req, res, next) => {
   try {
     const lab = await prisma.lab.create({ data: req.body });
     res.status(201).json({ success: true, data: lab });
@@ -16,10 +9,9 @@ router.post("/", authenticate, validate(labCreateSchema), async (req, res, next)
     if (handlePrismaError(err, res)) return;
     next(err);
   }
-});
+};
 
-// Get all labs (with pagination)
-router.get("/", async (req, res, next) => {
+const getLabs = async (req, res, next) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
@@ -40,10 +32,9 @@ router.get("/", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Get single lab by id
-router.get("/:id", async (req, res, next) => {
+const getLabById = async (req, res, next) => {
   try {
     const lab = await prisma.lab.findUnique({ where: { id: req.params.id } });
     if (!lab) return res.status(404).json({ success: false, message: "Lab not found" });
@@ -51,10 +42,9 @@ router.get("/:id", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-// Update lab (protected)
-router.put("/:id", authenticate, validate(labUpdateSchema), async (req, res, next) => {
+const updateLab = async (req, res, next) => {
   try {
     const lab = await prisma.lab.update({
       where: { id: req.params.id },
@@ -65,10 +55,9 @@ router.put("/:id", authenticate, validate(labUpdateSchema), async (req, res, nex
     if (handlePrismaError(err, res)) return;
     next(err);
   }
-});
+};
 
-// Delete lab (protected)
-router.delete("/:id", authenticate, async (req, res, next) => {
+const deleteLab = async (req, res, next) => {
   try {
     await prisma.lab.delete({ where: { id: req.params.id } });
     res.json({ success: true, message: "Lab deleted successfully" });
@@ -76,6 +65,12 @@ router.delete("/:id", authenticate, async (req, res, next) => {
     if (handlePrismaError(err, res)) return;
     next(err);
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  createLab,
+  getLabs,
+  getLabById,
+  updateLab,
+  deleteLab,
+};

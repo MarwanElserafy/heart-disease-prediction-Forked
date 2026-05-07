@@ -1,28 +1,40 @@
-from sqlalchemy import Column, Integer, Float, String, LargeBinary, JSON
-from core.database import Base
+from sqlalchemy import Column, Integer, Float, String, LargeBinary, JSON, ForeignKey
+from sqlalchemy.orm import relationship
+from db.database import Base
 
-class PatientPrediction(Base):
-    __tablename__ = "patients_predictions"
+class LabTest(Base):
+    __tablename__ = "lab_tests"
 
-    id = Column(Integer, primary_key=True, index=True)
-    age = Column(Integer)
-    sex = Column(Integer)
-    chest_pain_type = Column(Integer)
-    resting_bp_s = Column(Integer)
-    cholesterol = Column(Integer)
-    fasting_blood_sugar = Column(Integer)
-    resting_ecg = Column(Integer)
-    max_heart_rate = Column(Integer)
-    exercise_angina = Column(Integer)
-    oldpeak = Column(Float)
-    ST_slope = Column(Integer)
+    id = Column(String, primary_key=True, index=True)
+    lab_id = Column(String, nullable=False)
+    national_id = Column(String, nullable=False)
+    age = Column(Float, nullable=False)
+    sex = Column(Integer, nullable=False)
+    chest_pain_type = Column(Integer, nullable=False)
+    resting_bp_s = Column(Float, nullable=False)
+    cholesterol = Column(Float, nullable=False)
+    fasting_blood_sugar = Column(Integer, nullable=False)
+    resting_ecg = Column(Integer, nullable=False)
+    max_heart_rate = Column(Float, nullable=False)
+    exercise_angina = Column(Integer, nullable=False)
+    oldpeak = Column(Float, nullable=False)
+    st_slope = Column(Integer, nullable=False)
 
-    # ── Prediction Results ─────────────────────────────────────────────
-    prediction  = Column(Integer, nullable=True)   # 0 or 1 (binary from model)
-    probability = Column(Float,   nullable=True)   # 0.0 – 100.0 % from model
-    risk_level  = Column(String,  nullable=True)   # "Low Risk" / "Moderate Risk" / "High Risk"
-    decision    = Column(String,  nullable=True)   # "low" / "high" (data-driven @ 41%)
+    prediction = relationship("Prediction", back_populates="lab_test", uselist=False)
 
-    # ── Report Cache ───────────────────────────────────────────────────
-    shap_image      = Column(LargeBinary, nullable=True)
-    llm_report_json = Column(JSON,        nullable=True)
+
+class Prediction(Base):
+    __tablename__ = "predictions"
+
+    id = Column(String, primary_key=True, index=True)
+    lab_test_id = Column(String, ForeignKey("lab_tests.id"), unique=True)
+    
+    prediction_result = Column(Integer, nullable=True)
+    prediction_percentage = Column(Float, nullable=True)
+    risk_level = Column(String, nullable=True)
+    decision = Column(String, nullable=True)
+    
+    shap_image = Column(LargeBinary, nullable=True)
+    llm_report_json = Column(JSON, nullable=True)
+
+    lab_test = relationship("LabTest", back_populates="prediction")

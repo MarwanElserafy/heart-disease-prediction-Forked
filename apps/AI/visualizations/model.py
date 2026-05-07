@@ -287,7 +287,7 @@ class Model:
         voting_clf.fit(X, y)
         return voting_clf
     
-    def save_best_model(self, X_test, y_test, save_path="models/best_model.pkl", metric="accuracy"):
+    def save_best_model(self, X_test, y_test, save_path="assets/best_model.pkl", metric="accuracy"):
         """
         Save the best model based on performance metric.
         
@@ -298,7 +298,7 @@ class Model:
         y_test : pd.Series
             Test target for evaluation
         save_path : str
-            Path to save the model (default: "models/best_model.pkl")
+            Path to save the model (default: "assets/best_model.pkl")
         metric : str
             Metric to use for selecting best model (default: "accuracy")
             Options: "accuracy", "precision", "recall", "f1_score"
