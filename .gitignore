@@ -1,4 +1,5 @@
-Project/node_modules
+Project/
+node_modules/
 /images
 .env
 apps/AI/.env
