@@ -37,11 +37,10 @@ const userCreateSchema = z.object({
 // User Login Schema
 const userLoginSchema = z.object({
   body: z.object({
-    email: z
+    username: z
       .string({
-        required_error: "Email is required",
-      })
-      .email("Please enter a valid email address"),
+        required_error: "Username is required",
+      }),
 
     password: z
       .string({
