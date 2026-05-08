@@ -5,7 +5,7 @@ const featuresSchema = z.object({
   age: z.coerce
     .number({ invalid_type_error: "Age must be a number" })
     .int("Age must be an integer")
-    .min(1, "Age must be at least 1")
+    .min(0, "Age must be at least 0")
     .max(120, "Age must not exceed 120"),
 
   sex: z.coerce
@@ -16,15 +16,19 @@ const featuresSchema = z.object({
 
   chest_pain_type: z.coerce
     .number({ invalid_type_error: "Chest pain type must be a number" })
-    .int("Chest pain type must be an integer"),
+    .int("Chest pain type must be an integer")
+    .min(1, "Chest pain type must be between 1 and 4")
+    .max(4, "Chest pain type must be between 1 and 4"),
 
   resting_bp_s: z.coerce
     .number({ invalid_type_error: "Resting blood pressure must be a number" })
-    .positive("Resting blood pressure must be positive"),
+    .min(80, "Resting blood pressure must be between 80 and 220")
+    .max(220, "Resting blood pressure must be between 80 and 220"),
 
   cholesterol: z.coerce
     .number({ invalid_type_error: "Cholesterol must be a number" })
-    .nonnegative("Cholesterol must be non-negative"),
+    .min(100, "Cholesterol must be between 100 and 600")
+    .max(600, "Cholesterol must be between 100 and 600"),
 
   fasting_blood_sugar: z.coerce
     .number({ invalid_type_error: "Fasting blood sugar must be a number" })
@@ -34,13 +38,15 @@ const featuresSchema = z.object({
 
   resting_ecg: z.coerce
     .number({ invalid_type_error: "Resting ECG must be a number" })
-    .int("Resting ECG must be an integer"),
+    .int("Resting ECG must be an integer")
+    .min(0, "Resting ECG must be between 0 and 2")
+    .max(2, "Resting ECG must be between 0 and 2"),
 
   max_heart_rate: z.coerce
     .number({ invalid_type_error: "Max heart rate must be a number" })
     .int("Max heart rate must be an integer")
-    .min(40, "Max heart rate must be at least 40")
-    .max(250, "Max heart rate must not exceed 250"),
+    .min(60, "Max heart rate must be between 60 and 220")
+    .max(220, "Max heart rate must be between 60 and 220"),
 
   exercise_angina: z.coerce
     .number({ invalid_type_error: "Exercise angina must be a number" })
@@ -49,11 +55,15 @@ const featuresSchema = z.object({
     .max(1, "Exercise angina must be 0 or 1"),
 
   oldpeak: z.coerce
-    .number({ invalid_type_error: "Oldpeak must be a number" }),
+    .number({ invalid_type_error: "Oldpeak must be a number" })
+    .min(0, "Oldpeak must be between 0 and 10")
+    .max(10, "Oldpeak must be between 0 and 10"),
 
   st_slope: z.coerce
     .number({ invalid_type_error: "ST slope must be a number" })
-    .int("ST slope must be an integer"),
+    .int("ST slope must be an integer")
+    .min(0, "ST slope must be between 0 and 2")
+    .max(2, "ST slope must be between 0 and 2"),
 });
 
 // Lab Test Create Schema — lab_id هو cuid (string) مش MongoDB ObjectId

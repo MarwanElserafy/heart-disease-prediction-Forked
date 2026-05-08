@@ -1,0 +1,67 @@
+{
+  "register": [
+    {
+      "national_id": "30105012345678",
+      "username": "youssef amr",
+      "email": "youssefamr4331@gmail.com",
+      "password": "youssef123"
+    },
+    {
+      "national_id": "30203024567891",
+      "username": "omar ahmed",
+      "email": "omarahmed2026@gmail.com",
+      "password": "omar1234"
+    },
+    {
+      "national_id": "30307034567892",
+      "username": "george anwer",
+      "email": "georgeanwer2026@gmail.com",
+      "password": "george1234"
+    },
+    {
+      "national_id": "30404014567893",
+      "username": "ranim mohamed",
+      "email": "ranimmohamed2026@gmail.com",
+      "password": "ranim1234"
+    },
+    {
+      "national_id": "30501024567894",
+      "username": "samar hamza",
+      "email": "samarhamza2026@gmail.com",
+      "password": "samar1234"
+    },
+    {
+      "national_id": "30602034567895",
+      "username": "aya hassan",
+      "email": "ayahassan2026@gmail.com",
+      "password": "aya1234"
+    }
+  ],
+  "login": [
+    {
+      "username": "youssef amr",
+      "password": "youssef123"
+    },
+    {
+      "username": "omar ahmed",
+      "password": "omar1234"
+    },
+    {
+      "username": "george anwer",
+      "password": "george1234"
+    },
+    {
+      "username": "ranim mohamed",
+      "password": "ranim1234"
+    },
+    {
+      "username": "samar hamza",
+      "password": "samar1234"
+    },
+    {
+      "username": "aya hassan",
+      "password": "aya1234"
+    }
+  ]
+}
+

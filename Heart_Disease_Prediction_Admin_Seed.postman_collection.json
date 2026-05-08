@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "Heart Disease Prediction - Admin & Seed",
+    "_postman_id": "hd-prediction-api-2026-admin-seed",
+    "description": "Admin/seed utilities (NOT for frontend).\n\nIncludes:\n- Create labs/hospitals (requires JWT + x-admin-key)\n- Bulk upload labtests CSVs (optional)\n- Read users/labs/hospitals/labtests for debugging\n\nBackend Base URL: http://localhost:5000",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "admin_key", "value": "", "type": "string" },
+    { "key": "lab_id", "value": "", "type": "string" },
+    { "key": "hospital_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth (admin)",
+      "item": [
+        {
+          "name": "Login (admin user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (pm.response.code === 200 && json.token) pm.environment.set('token', json.token);",
+                  "console.log('Login response:', json);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"\",\n  \"password\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Labs (seed/admin)",
+      "item": [
+        {
+          "name": "Create Lab (admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"lab_code\": \"\",\n  \"address\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/labs", "host": ["{{base_url}}"], "path": ["api", "labs"] }
+          }
+        },
+        {
+          "name": "Get All Labs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/api/labs?page=1&limit=100", "host": ["{{base_url}}"], "path": ["api", "labs"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "100" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hospitals (seed/admin)",
+      "item": [
+        {
+          "name": "Create Hospital (admin key required)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (pm.response.code === 201 && json.data && json.data.id) pm.environment.set('hospital_id', json.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-admin-key", "value": "{{admin_key}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"area\": \"\",\n  \"google_maps_link\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/hospitals", "host": ["{{base_url}}"], "path": ["api", "hospitals"] }
+          }
+        },
+        {
+          "name": "Get All Hospitals",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/api/hospitals?page=1&limit=100", "host": ["{{base_url}}"], "path": ["api", "hospitals"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "100" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "LabTests (bulk/admin)",
+      "item": [
+        {
+          "name": "Upload 1-5 LabTests CSVs (bulk)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "files", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/labtests/upload-csvs", "host": ["{{base_url}}"], "path": ["api", "labtests", "upload-csvs"] }
+          }
+        },
+        {
+          "name": "Get All LabTests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/api/labtests?page=1&limit=50", "host": ["{{base_url}}"], "path": ["api", "labtests"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "50" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users (debug/admin)",
+      "item": [
+        {
+          "name": "Get All Users (debug)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/users?page=1&limit=50", "host": ["{{base_url}}"], "path": ["api", "users"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "50" }] }
+          }
+        }
+      ]
+    }
+  ]
+}
+
