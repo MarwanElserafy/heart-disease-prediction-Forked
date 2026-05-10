@@ -22,6 +22,7 @@ model Lab {
   id        String    @id @default(cuid())
   name      String
   lab_code  String    @unique
+  lab_phone Int       @unique
   address   String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

@@ -121,7 +121,7 @@ Mandatory Writing Rules:
   2. Never state definitively that the patient "has" or "is diagnosed with" heart disease
   3. Do not include statistics or numbers not provided in the input above
   4. Keep the explanation concise: 2-3 sentences only
-  5. Recommendations must be practical and specific: 3-5 bullet points
+  5. Recommendations must be practical and specific: EXACTLY 5 bullet points
   6. Write in clear, patient-friendly English
 """
 

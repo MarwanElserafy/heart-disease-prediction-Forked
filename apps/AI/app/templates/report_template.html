@@ -1,382 +1,511 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
+
 <head>
     <meta charset="UTF-8">
-    <title>Medical Report</title>
-    <!-- Import Cairo Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeartCare - Medical Analysis Report</title>
+    <!-- Import Professional Medical Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            margin: 0;
-            /* padding: 20px; */
-            color: #333;
-            text-align: right;
-            direction: rtl;
-            background-color: #fff;
-            line-height: 1.6;
+        :root {
+            --primary-color: #00838F;
+            --secondary-color: #00ACC1;
+            --accent-color: #006064;
+            --text-dark: #2c3e50;
+            --text-muted: #546e7a;
+            --border-color: #e0e0e0;
+            --bg-light: #f8f9fa;
+            --risk-high: #d32f2f;
+            --risk-moderate: #fbc02d;
+            --risk-low: #388e3c;
         }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            color: var(--text-dark);
+            text-align: left;
+            /* Changed from right */
+            direction: ltr;
+            /* Changed from rtl */
+            background-color: #fff;
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
+        }
+
         @page {
             size: A4;
-            margin: 15mm; /* تقليل الهوامش لزيادة المساحة المتاحة */
+            margin: 15mm;
         }
 
-        body {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* منع انقسام الجداول أو البطاقات بين الصفحات */
-        table, .visual-card, .interpretation, .info-grid {
+        /* Prevent split tables or cards between pages */
+        table,
+        .visual-card,
+        .interpretation,
+        .info-grid {
             page-break-inside: avoid;
             break-inside: avoid;
         }
 
-        /* التأكد من أن العنوان لا يظهر وحيداً في نهاية الصفحة */
+        /* Ensure titles don't end up alone at the bottom of a page */
         .section-title {
             page-break-after: avoid;
             break-after: avoid;
+            font-family: 'Outfit', sans-serif;
         }
 
         @media print {
-            table td, table th {
-                padding: 5px 8px; /* تقليل المسافات الداخلية */
-                font-size: 12px;   /* تصغير الخط قليلاً */
+            body {
+                padding: 0;
             }
+
+            table td,
+            table th {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+
             .section-title {
-                margin-top: 15px; /* تقليل المسافات بين الأقسام */
+                margin-top: 20px;
+            }
+
+            .header {
+                padding-bottom: 15px;
+                margin-bottom: 20px;
             }
         }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #00ACC1;
-            padding-bottom: 20px;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 25px;
             margin-bottom: 30px;
         }
 
         .header-logo img {
-            max-height: 80px;
+            max-height: 70px;
+            width: auto;
+            padding-right: 40px;
         }
 
         .header-info {
-            text-align: left; /* Keep left if using RTL because it aligns to the logical end if we flex, wait, under RTL, left is the far side */
+            text-align: left;
+            /* Aligned to the right for English LTR layout */
+            font-size: 13px;
+            color: var(--text-muted);
         }
-        
-        /* Flexbox handles the reversal in RTL */
-        .header-content {
-            flex-grow: 1;
+
+        .header-info strong {
+            color: var(--primary-color);
+            /* display: block; */
+            font-size: 12px;
+            margin-bottom: 2px;
         }
-        
+
         .header-title-container {
-            margin-left: auto;
-            margin-right: auto;
-            width: fit-content; 
+            text-align: center;
+            flex-grow: 1;
         }
 
         .header-title-container h1 {
-            color: #00838F;
+            color: var(--primary-color);
             margin: 0;
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 800;
-        }
-
-        .header-title-container p {
-            margin: 5px 0 0 0;
-            color: #555;
-            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Outfit', sans-serif;
         }
 
         .section-title {
-            color: #00838F;
-            font-size: 20px;
-            font-weight: 800;
-            border-bottom: 1px solid #E0E0E0;
-            padding-bottom: 5px;
+            color: var(--primary-color);
+            font-size: 18px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--bg-light);
+            padding-bottom: 8px;
             margin-bottom: 15px;
-            margin-top: 30px;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: var(--secondary-color);
+            margin-right: 10px;
+            border-radius: 2px;
         }
 
         .info-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: 8px;
         }
 
         .info-item {
             display: flex;
+            align-items: center;
+            border-bottom: 1px dashed #cfd8dc;
+            padding-bottom: 5px;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
         }
 
         .info-label {
             font-weight: 600;
-            width: 150px;
-            color: #555;
+            width: 140px;
+            color: var(--text-muted);
+            font-size: 13px;
         }
 
         .info-value {
-            color: #000;
-            font-weight: 600;
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 14px;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        th, td {
-            text-align: right;
-            padding: 10px;
-            border-bottom: 1px solid #E0E0E0;
+        th,
+        td {
+            text-align: left;
+            /* Changed from right */
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
         }
 
         th {
-            background-color: #E0F7FA;
-            color: #00838F;
-            font-weight: 800;
+            background-color: var(--bg-light);
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-size: 13px;
         }
 
         .visuals-container {
             display: flex;
             flex-direction: column;
-            gap: 30px;
-            margin-top: 20px;
+            gap: 25px;
+            margin-top: 15px;
             align-items: center;
         }
 
         .visual-card {
             background: #fff;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             width: 100%;
             text-align: center;
+            box-sizing: border-box;
         }
 
         .visual-card h3 {
-            color: #00838F;
+            color: var(--primary-color);
             margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 700;
         }
 
         .visual-card img {
             max-width: 100%;
             height: auto;
-            border-radius: 4px;
+            border-radius: 6px;
         }
 
         .interpretation {
-            background-color: #F9FBE7;
-            border-right: 4px solid #827717;
-            padding: 15px;
+            background-color: #fdfae6;
+            border-left: 4px solid #c0b333;
+            /* Changed from border-right for LTR */
+            padding: 20px;
             margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+            color: #4a4a4a;
         }
 
         .recommendations {
             margin-top: 15px;
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 8px;
         }
 
         .recommendations ul {
-            padding-right: 20px;
+            padding-left: 25px;
+            /* Changed from padding-right for LTR */
             margin: 0;
         }
 
         .recommendations li {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            position: relative;
         }
 
         .footer {
-            margin-top: 50px;
+            margin-top: 20px;
             text-align: center;
-            font-size: 12px;
-            color: #888;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
-        }
-
-        .page-break {
-            page-break-before: always;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            padding-bottom: 10px;
         }
 
         /* Risk Score Colors */
-        .risk-high { color: red; }
-        .risk-low { color: green; }
-        .risk-moderate { color: rgb(235, 235, 42); }
+        .risk-high {
+            color: var(--risk-high) !important;
+        }
+
+        .risk-low {
+            color: var(--risk-low) !important;
+        }
+
+        .risk-moderate {
+            color: var(--risk-moderate) !important;
+        }
+
+        .report-page {
+            width: 100%;
+            page-break-after: always;
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        .report-page:last-child {
+            page-break-after: auto;
+        }
+
+        .main-report-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .bottom-sections-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 230mm;
+            /* Ensures footer stays at the bottom of the last page */
+            justify-content: space-between;
+        }
     </style>
 </head>
+
 <body>
+    <div class="main-report-wrapper" style="padding: 10px; max-width: 850px; margin: 0 auto;">
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="header-logo">
-            <img src="../../../Frontend/src/assets/Logo.png" alt="University Logo">
+        <!-- PAGE 1: DEMOGRAPHICS & CLINICAL DATA -->
+        <div class="report-page">
+            <!-- HEADER -->
+            <div class="header">
+                <div class="header-info">
+                    <p style="margin:0;"><strong>HeartCare Medical Center</strong></p>
+                    <p style="margin-left:4px; margin-bottom:0px; margin-top:0px; margin-right:0px; ">Cardiology
+                        Department</p>
+                    <p style="margin:0;"><strong>Lab Test ID:</strong> {{ lab_test.id }}</p>
+                    <p style="margin:0;"><strong>Date:</strong> {{ date }}</p>
+                    <p style="margin:0;"><strong>Lab Phone:</strong> {{ lab.lab_phone }}</p>
+                </div>
+
+                <div class="header-title-container">
+                    <h1>Medical Analysis Report</h1>
+                </div>
+                <div class="header-logo">
+                    <img src="../../../Frontend/src/assets/Logo.png" alt="Hospital Logo"
+                        onerror="this.src='https://via.placeholder.com/150x70?text=HEARTCARE'">
+                </div>
+            </div>
+
+            <!-- DEMOGRAPHICS -->
+            <div class="section-title">Patient Demographics</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Patient Name:</div>
+                    <div class="info-value">{{ patient.name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Sex:</div>
+                    <div class="info-value">{{ patient.gender }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">National ID:</div>
+                    <div class="info-value">{{ patient.national_id }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lab Name:</div>
+                    <div class="info-value">{{ lab.name }}</div>
+                </div>
+            </div>
+
+            <!-- PATIENT DATA (CLINICAL FACTORS) -->
+            <div class="section-title">Clinical Factors & Lab Results</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Medical Factor</th>
+                        <th>Patient Value</th>
+                        <th>Reference / Context</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Age</td>
+                        <td>{{ patient.age }} years</td>
+                        <td>Adult (18+ years)</td>
+                    </tr>
+                    <tr>
+                        <td>Chest Pain Type (CP)</td>
+                        <td>{{ patient.cp }}</td>
+                        <td>1:Typical, 2:Atypical, 3:Non-anginal, 4:Asymptomatic</td>
+                    </tr>
+                    <tr>
+                        <td>Resting Blood Pressure</td>
+                        <td>{{ patient.trestbps }} mmHg</td>
+                        <td>Normal: &lt;120 mmHg</td>
+                    </tr>
+                    <tr>
+                        <td>Cholesterol Level</td>
+                        <td>{{ patient.chol }} mg/dL</td>
+                        <td>Desirable: &lt;200 mg/dL</td>
+                    </tr>
+                    <tr>
+                        <td>Fasting Blood Sugar</td>
+                        <td>{{ patient.fbs }}</td>
+                        <td>Normal: &lt;120 mg/dL</td>
+                    </tr>
+                    <tr>
+                        <td>Resting ECG</td>
+                        <td>{{ patient.restecg }}</td>
+                        <td>Normal ECG Pattern</td>
+                    </tr>
+                    <tr>
+                        <td>Max Heart Rate Achieved</td>
+                        <td>{{ patient.thalach }} bpm</td>
+                        <td>Target: ~{{ 220 - patient.age|int }} bpm</td>
+                    </tr>
+                    <tr>
+                        <td>Exercise-Induced Angina</td>
+                        <td>{{ patient.exang }}</td>
+                        <td>Normal: Negative (No)</td>
+                    </tr>
+                    <tr>
+                        <td>ST Depression (Oldpeak)</td>
+                        <td>{{ patient.oldpeak }}</td>
+                        <td>Normal: 0</td>
+                    </tr>
+                    <tr>
+                        <td>ST Slope</td>
+                        <td>{{ patient.slope }}</td>
+                        <td>1:Upsloping, 2:Flat, 3:Downsloping</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="header-title-container">
-            <h1>MEDICAL REPORT</h1>
+
+        <!-- PAGE 2: AI VISUAL ANALYSIS -->
+        <div class="report-page">
+            <div class="section-title">AI Diagnostic Analysis</div>
+            <div class="visuals-container">
+                <div class="visual-card">
+                    <h3
+                        class="{% if risk_score|float > 60 %}risk-high{% elif risk_score|float < 40 %}risk-low{% else %}risk-moderate{% endif %}">
+                        Calculated Cardiac Risk Score: {{ risk_score }}%
+                    </h3>
+                    <img src="{{ images.risk_gauge }}" alt="Risk Level Gauge" style="max-height: 280px;">
+                    <p style="font-size: 12px; color: #777; margin-top: 10px;">This score represents the statistical
+                        probability based on clinical factors.</p>
+                </div>
+
+                <div class="visual-card">
+                    <h3>Primary Risk Contributors (SHAP Analysis)</h3>
+                    <img src="{{ images.shap_plot }}" alt="Feature Importance Plot" style="max-width: 100%;">
+                    <p style="font-size: 11px; color: #777; margin-top: 10px; text-align: left;">Factors pushing the bar
+                        to the <strong>right</strong> increase risk, while factors to the <strong>left</strong> decrease
+                        it.</p>
+                </div>
+            </div>
         </div>
-        <div class="header-info">
-            <p style="margin:0;"><strong>HeartCare Medical Center<br>Cardiology Department</strong></p>
-            <p style="margin:0;"><strong>Date:</strong> {{ date }}</p>
-            <p style="margin:0;"><strong>Phone:</strong> +20 120 273 3958</p>
+
+        <!-- PAGE 3: INTERPRETATION & RECOMMENDATIONS -->
+        <div class="report-page">
+            <div class="bottom-sections-container">
+                <div class="section-title">Clinical Interpretation</div>
+                <div class="interpretation">
+                    {{ llm_report.summary }}
+                </div>
+
+                <div class="section-title">Medical Recommendations</div>
+                <div class="recommendations">
+                    <ul>
+                        {% for rec in llm_report.recommendations %}
+                        <li>{{ rec }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="footer">
+                    <p><strong>Disclaimer:</strong> This report is generated by an AI-assisted diagnostic system. It
+                        should be reviewed by a qualified cardiologist. Final clinical decisions must be made by a
+                        medical professional.</p>
+                    <p>&copy; 2026 HeartCare Systems - Advanced Cardiac Diagnostics</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- DEMOGRAPHICS -->
-    <div class="section-title">Patient Demographics</div>
-    <div class="info-grid">
-        <div class="info-item">
-            <div class="info-label">Patient Name:</div>
-            <div class="info-value">{{ patient.name }}</div>
-        </div>
-        <div class="info-item">
-            <div class="info-label">Sex:</div>
-            <div class="info-value">{{ patient.gender }}</div>
-        </div>
-        <div class="info-item">
-            <div class="info-label">Date of Birth:</div>
-            <div class="info-value">{{ patient.dob }}</div>
-        </div>
-        <div class="info-item">
-            <div class="info-label">National ID:</div>
-            <div class="info-value">{{ patient.national_id }}</div>
-        </div>
-        <div class="info-item" style="grid-column: span 2;">
-            <div class="info-label">Address:</div>
-            <div class="info-value">{{ patient.address }}</div>
-        </div>
-    </div>
-
-    <!-- PATIENT DATA (CLINICAL FACTORS) -->
-    <div class="section-title">Patient Data</div>
-    <table>
-        <thead>
-            <tr>
-                <th>Factor</th>
-                <th>Patient Data</th>
-                <th>Reference Range</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Age</td>
-                <td>{{ patient.age }} years</td>
-                <td>Adult: 18+ years</td>
-            </tr>
-            <tr>
-                <td>Chest Pain Type</td>
-                <td>{{ patient.cp }}</td>
-                <td>1=Typical, 2=Atypical, 3=Non-anginal, 4=Asymptomatic</td>
-            </tr>
-            <tr>
-                <td>Resting Blood Pressure</td>
-                <td>{{ patient.trestbps }} mmHg</td>
-                <td>Normal: &lt;120 mmHg</td>
-            </tr>
-            <tr>
-                <td>Cholesterol</td>
-                <td>{{ patient.chol }} mg/dL</td>
-                <td>Desirable: &lt;200 mg/dL</td>
-            </tr>
-            <tr>
-                <td>Fasting Blood Sugar</td>
-                <td>{{ patient.fbs }}</td>
-                <td>Normal: &lt;120 mg/dL</td>
-            </tr>
-            <tr>
-                <td>Resting ECG</td>
-                <td>{{ patient.restecg }}</td>
-                <td>Normal ECG Pattern</td>
-            </tr>
-            <tr>
-                <td>Max Heart Rate</td>
-                <td>{{ patient.thalach }} bpm</td>
-                <td>Expected for age: up to ~197 bpm</td>
-            </tr>
-            <tr>
-                <td>Exercise-Induced Angina</td>
-                <td>{{ patient.exang }}</td>
-                <td>Normal: No</td>
-            </tr>
-            <tr>
-                <td>Oldpeak</td>
-                <td>{{ patient.oldpeak }}</td>
-                <td>Normal: 0</td>
-            </tr>
-            <tr>
-                <td>ST Slope</td>
-                <td>{{ patient.slope }}</td>
-                <td>1=Upsloping, 2=Flat, 3=Downsloping</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="page-break"></div>
-
-    <!-- PREDICTION RESULTS & VISUALS -->
-    <div class="section-title">Prediction Result</div>
-    <div class="visuals-container">
-        
-        <div class="visual-card">
-            <h3 class="{% if risk_score|float > 60 %}risk-high{% elif risk_score|float < 40 %}risk-low{% else %}risk-moderate{% endif %}">
-                AI Risk Score: {{ risk_score }}%
-            </h3>   
-            <img src="{{ images.risk_gauge }}" alt="Risk Level" style="max-height: 300px;">
-        </div>
-
-        <div class="visual-card">
-            <h3>The Important Effected in Result:</h3>
-            <img src="{{ images.shap_plot }}" alt="SHAP Analysis" style="max-width: 100%;">
-        </div>
-        
-    </div>
-
-    <!-- MEDICAL INTERPRETATION -->
-    <div class="section-title">Medical Interpretation</div>
-    <div class="interpretation">
-        {{ llm_report.summary }}
-    </div>
-
-    <div class="section-title">Recommendations</div>
-    <div class="recommendations">
-        <ul>
-            {% for rec in llm_report.recommendations %}
-            <li>{{ rec }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="footer">
-        Generated By Graduation Team With Using AI To Generate This Report
-    </div>
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // 1. الوصول إلى العنصر (يفضل إضافة id للعنصر لتسهيل الوصول إليه)
-        // سنبحث هنا عن الـ h3 الذي يحتوي على نص "AI Risk Score"
-        const riskElements = document.querySelectorAll('h3');
-        riskElements.forEach(el => {
-            if (el.textContent.includes('AI Risk Score')) {
-                // 2. استخراج الرقم من النص (مثلاً: "AI Risk Score: 75%")
-                const scoreMatch = el.textContent.match(/(\d+(\.\d+)?)/);
-                if (scoreMatch) {
-                    const score = parseFloat(scoreMatch[0]);
-
-                    // 3. تطبيق المنطق المطلوب
-                    if (score > 60) {
-                        el.style.color = 'red';
-                    } else if (score < 40) {
-                        el.style.color = 'green';
-                    } else {
-                        el.style.color = 'black'; // أو اللون الافتراضي
+        document.addEventListener("DOMContentLoaded", function () {
+            const riskHeaders = document.querySelectorAll('h3');
+            riskHeaders.forEach(el => {
+                if (el.textContent.includes('Risk Score')) {
+                    const scoreMatch = el.textContent.match(/(\d+(\.\d+)?)/);
+                    if (scoreMatch) {
+                        const score = parseFloat(scoreMatch[0]);
+                        if (score > 60) {
+                            el.className = 'risk-high';
+                        } else if (score < 40) {
+                            el.className = 'risk-low';
+                        } else {
+                            el.className = 'risk-moderate';
+                        }
                     }
                 }
-            }
+            });
         });
-    });
-</script>
-
-
+    </script>
 </body>
+
 </html>
