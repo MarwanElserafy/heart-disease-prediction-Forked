@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 
-def generate_medical_report_pdf(patient_data, risk_score, llm_report, images_base64):
+def generate_medical_report_pdf(patient_data, risk_score, llm_report, images_base64, lab_data=None, lab_test_data=None):
     """
     Generates a PDF medical report from a Jinja2 template.
 
@@ -32,7 +32,9 @@ def generate_medical_report_pdf(patient_data, risk_score, llm_report, images_bas
         risk_score=risk_score,
         llm_report=llm_report,
         images=images_base64,
-        date=current_date
+        date=current_date,
+        lab=lab_data or {},
+        lab_test=lab_test_data or {}
     )
 
     # Convert HTML to PDF using WeasyPrint

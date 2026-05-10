@@ -22,7 +22,6 @@ model Lab {
   id        String    @id @default(cuid())
   name      String
   lab_code  String    @unique
-  lab_phone Int       @unique
   address   String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -64,7 +63,10 @@ model Prediction {
   risk_level            String?
   decision              String?
   shap_image            Bytes?
+  shap_values_json      Json?
   llm_report_json       Json?
+  pdf_binary            Bytes?
+  report_generated_at   String?
   createdAt             DateTime? @default(now())
   updatedAt             DateTime? @updatedAt
   

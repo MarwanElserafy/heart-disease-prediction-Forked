@@ -12,9 +12,12 @@ router = APIRouter(prefix="/shap", tags=["Explainability"])
 def show_shap(id: str, db: Session = Depends(get_db)):
     patient = db.query(LabTest).filter(LabTest.id == id).first()
     if not patient:
+        patient = db.query(LabTest).filter(LabTest.national_id == id).order_by(LabTest.createdAt.desc()).first()
+    
+    if not patient:
         raise HTTPException(status_code=404, detail="LabTest not found")
 
-    prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == id).first()
+    prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == patient.id).first()
     if not prediction_record:
         raise HTTPException(status_code=400, detail="Prediction not evaluated yet. Call POST /predict/{id} first.")
 
@@ -38,9 +41,12 @@ def show_shap(id: str, db: Session = Depends(get_db)):
 def get_shap_data(id: str, db: Session = Depends(get_db)):
     patient = db.query(LabTest).filter(LabTest.id == id).first()
     if not patient:
+        patient = db.query(LabTest).filter(LabTest.national_id == id).order_by(LabTest.createdAt.desc()).first()
+    
+    if not patient:
         raise HTTPException(status_code=404, detail="LabTest not found")
 
-    prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == id).first()
+    prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == patient.id).first()
     if not prediction_record:
         raise HTTPException(status_code=400, detail="Prediction not evaluated yet. Call POST /predict/{id} first.")
 

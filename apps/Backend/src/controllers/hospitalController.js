@@ -47,7 +47,7 @@ const getHospitalById = async (req, res, next) => {
 const getHospitalsByArea = async (req, res, next) => {
   try {
     const hospitals = await prisma.hospital.findMany({
-      where: { area: { equals: req.params.area, mode: "insensitive" } },
+      where: { area: { contains: req.params.area, mode: "insensitive" } },
     });
     res.json({ success: true, data: hospitals });
   } catch (err) {

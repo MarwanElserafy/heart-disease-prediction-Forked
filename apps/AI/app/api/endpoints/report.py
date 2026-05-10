@@ -24,7 +24,15 @@ router = APIRouter(tags=["Report"])
 
 @router.get("/predict/{id}/report")
 def get_prediction_report(id: str, db: Session = Depends(get_db)):
+    # Try to find prediction by labtest ID directly
     prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == id).first()
+    
+    # If not found, check if 'id' is a national_id and find the latest prediction for that patient
+    if not prediction_record:
+        patient = db.query(LabTest).filter(LabTest.national_id == id).order_by(LabTest.createdAt.desc()).first()
+        if patient:
+            prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == patient.id).first()
+
     if not prediction_record:
         raise HTTPException(
             status_code=400,

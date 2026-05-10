@@ -39,6 +39,7 @@
                   "const json = pm.response.json();",
                   "if (pm.response.code === 200 && json.token) {",
                   "  pm.environment.set('token', json.token);",
+                  "  pm.environment.set('national_id', json.data.national_id);",
                   "  pm.environment.set('labtest_id', '');",
                   "}",
                   "console.log('Login response:', json);"
@@ -159,13 +160,26 @@
     },
     {
       "name": "AI & ML",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const labtestId = pm.environment.get('labtest_id');",
+              "const nationalId = pm.environment.get('national_id');",
+              "pm.variables.set('target_id', labtestId ? labtestId : nationalId);"
+            ]
+          }
+        }
+      ],
       "item": [
         {
           "name": "Start Prediction (uses labtest_id)",
           "request": {
             "method": "POST",
             "header": [],
-            "url": { "raw": "{{ai_url}}/predict/{{labtest_id}}", "host": ["{{ai_url}}"], "path": ["predict", "{{labtest_id}}"] }
+            "url": { "raw": "{{ai_url}}/predict/{{target_id}}", "host": ["{{ai_url}}"], "path": ["predict", "{{target_id}}"] }
           }
         },
         {
@@ -173,7 +187,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": { "raw": "{{ai_url}}/shap/{{labtest_id}}", "host": ["{{ai_url}}"], "path": ["shap", "{{labtest_id}}"] }
+            "url": { "raw": "{{ai_url}}/shap/{{target_id}}", "host": ["{{ai_url}}"], "path": ["shap", "{{target_id}}"] }
           }
         },
         {
@@ -181,7 +195,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": { "raw": "{{ai_url}}/predict/{{labtest_id}}/report", "host": ["{{ai_url}}"], "path": ["predict", "{{labtest_id}}", "report"] }
+            "url": { "raw": "{{ai_url}}/predict/{{target_id}}/report", "host": ["{{ai_url}}"], "path": ["predict", "{{target_id}}", "report"] }
           }
         }
       ]

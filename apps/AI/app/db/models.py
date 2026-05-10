@@ -20,7 +20,6 @@ class Lab(Base):
     id = Column(String, primary_key=True, index=True)
     name = Column(String, nullable=False)
     lab_code = Column(String, nullable=False)
-    lab_phone = Column(Integer, nullable=False)
     address = Column(String, nullable=False)
     createdAt = Column(DateTime, default=datetime.utcnow)
     updatedAt = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -42,6 +41,8 @@ class LabTest(Base):
     exercise_angina = Column(Integer, nullable=False)
     oldpeak = Column(Float, nullable=False)
     st_slope = Column(Integer, nullable=False)
+    createdAt = Column(DateTime, default=datetime.utcnow)
+    updatedAt = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     prediction = relationship("Prediction", back_populates="lab_test", uselist=False)
 
@@ -62,5 +63,7 @@ class Prediction(Base):
     llm_report_json = Column(JSON, nullable=True)
     pdf_binary = Column(LargeBinary, nullable=True)
     report_generated_at = Column(String, nullable=True)
+    createdAt = Column(DateTime, default=datetime.utcnow)
+    updatedAt = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     lab_test = relationship("LabTest", back_populates="prediction")

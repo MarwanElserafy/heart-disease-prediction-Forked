@@ -27,9 +27,16 @@ router = APIRouter(tags=["Prediction"])
 
 @router.post("/predict/{id}")
 def create_prediction(id: str, db: Session = Depends(get_db)):
+    # First, try to find the LabTest by its unique ID
     patient = db.query(LabTest).filter(LabTest.id == id).first()
+    
+    # If not found, check if the 'id' provided is actually a national_id and get their latest test
     if not patient:
-        raise HTTPException(status_code=404, detail="LabTest not found. Please create the LabTest first.")
+        patient = db.query(LabTest).filter(LabTest.national_id == id).order_by(LabTest.createdAt.desc()).first()
+
+    # If still not found, return the requested error message
+    if not patient:
+        raise HTTPException(status_code=404, detail="you don’t have data or the lab doesn’t finish the report file")
 
     # Fetch patient name from shared users table
     user_record = db.query(User).filter(User.national_id == patient.national_id).first()
@@ -38,9 +45,19 @@ def create_prediction(id: str, db: Session = Depends(get_db)):
     # Fetch lab info
     lab_record = db.query(Lab).filter(Lab.id == patient.lab_id).first()
 
-    prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == id).first()
+    prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == patient.id).first()
     if prediction_record and prediction_record.prediction_result is not None:
-        raise HTTPException(status_code=409, detail="A prediction already exists for this LabTest.")
+        assessment, _ = ml_service.assess_full_prediction([], probability=prediction_record.prediction_percentage)
+        return {
+            "id":             prediction_record.id,
+            "lab_test_id":    prediction_record.lab_test_id,
+            "prediction":     prediction_record.prediction_result,
+            "probability":    prediction_record.prediction_percentage,
+            "risk_level":     prediction_record.risk_level,
+            "decision":       prediction_record.decision,
+            "risk_color":     assessment.risk_color,
+            "decision_label": assessment.decision_label,
+        }
 
     data = [
         patient.age, patient.sex, patient.chest_pain_type,
@@ -55,9 +72,9 @@ def create_prediction(id: str, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Model inference failed: {str(e)}")
     
-    prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == id).first()
+    prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == patient.id).first()
     if not prediction_record:
-        prediction_record = Prediction(id=str(uuid.uuid4()), lab_test_id=id)
+        prediction_record = Prediction(id=str(uuid.uuid4()), lab_test_id=patient.id)
         db.add(prediction_record)
 
     prediction_record.prediction_result  = 1 if assessment.decision.value == "high" else 0
@@ -126,11 +143,22 @@ def create_prediction(id: str, db: Session = Depends(get_db)):
         "shap_plot": shap_chart
     }
 
+    lab_data = {
+        "name": lab_record.name if lab_record else "N/A",
+        "address": lab_record.address if lab_record else "N/A",
+    }
+
+    lab_test_data = {
+        "id": patient.id,
+    }
+
     pdf_bytes_io = generate_medical_report_pdf(
         patient_data=patient_data,
         risk_score=risk_score,
         llm_report=llm_report,
-        images_base64=images_base64
+        images_base64=images_base64,
+        lab_data=lab_data,
+        lab_test_data=lab_test_data
     )
 
     prediction_record.pdf_binary = pdf_bytes_io.getvalue()
@@ -152,6 +180,12 @@ def create_prediction(id: str, db: Session = Depends(get_db)):
 @router.get("/predict/{id}")
 def get_prediction(id: str, db: Session = Depends(get_db)):
     prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == id).first()
+    
+    if not prediction_record:
+        patient = db.query(LabTest).filter(LabTest.national_id == id).order_by(LabTest.createdAt.desc()).first()
+        if patient:
+            prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == patient.id).first()
+
     if not prediction_record:
         raise HTTPException(status_code=404, detail="Prediction not found. Call POST /predict/{id} first.")
 
