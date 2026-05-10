@@ -32,5 +32,5 @@ requests
 
 # ── Report Generation (HTML → PDF pipeline) ────────────────────────────────
 jinja2                # HTML templating
-weasyprint            # Primary HTML → PDF (no external binaries needed)
+xhtml2pdf             # Primary HTML → PDF (no external binaries needed)
 pdfkit                # Fallback HTML → PDF (requires wkhtmltopdf binary)

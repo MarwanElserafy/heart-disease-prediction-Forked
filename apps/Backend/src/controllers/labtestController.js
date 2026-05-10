@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma");
 const { handlePrismaError } = require("../middlewares/prismaErrors");
+const fs = require("fs/promises");
 const path = require("path");
 const { parse } = require("csv-parse/sync");
 

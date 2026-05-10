@@ -37,13 +37,14 @@ def generate_medical_report_pdf(patient_data, risk_score, llm_report, images_bas
         lab_test=lab_test_data or {}
     )
 
-    # Convert HTML to PDF using WeasyPrint
-    from weasyprint import HTML
-    pdf_file = io.BytesIO()
-    
-    # Passing base_url is important if there are relative links/assets, 
-    # though in this case we use base64 embedded images. 
-    HTML(string=html_out, base_url=templates_dir).write_pdf(pdf_file)
+    # Generate PDF using playwright
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        page.set_content(html_out)
+        pdf_bytes = page.pdf(format="A4", margin={"top": "20px", "right": "20px", "bottom": "20px", "left": "20px"})
+        browser.close()
 
-    pdf_file.seek(0)
+    pdf_file = io.BytesIO(pdf_bytes)
     return pdf_file
