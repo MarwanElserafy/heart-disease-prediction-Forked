@@ -1,6 +1,5 @@
 const prisma = require("../config/prisma");
 const { handlePrismaError } = require("../middlewares/prismaErrors");
-const fs = require("fs/promises");
 const path = require("path");
 const { parse } = require("csv-parse/sync");
 
@@ -127,7 +126,6 @@ const rowToLabTestData = async ({ row, file, enforceNationalId, reqUser }) => {
     lab_code,
     file: {
       originalname: file?.originalname,
-      filename: file?.path ? path.basename(file.path) : undefined,
     },
     data: shapeLabTest(labTest),
   };
@@ -167,7 +165,7 @@ const uploadLabTestsCsvs = async (req, res, next) => {
 
     for (const file of files) {
       try {
-        const csvText = await fs.readFile(file.path, "utf8");
+        const csvText = file.buffer.toString("utf8");
         const row = parseSingleRowCsv(csvText);
         const national_id = String(row.national_id || "").trim();
         if (seenNationalIds.has(national_id)) {
@@ -223,7 +221,7 @@ const uploadLabTestCsvForUser = async (req, res, next) => {
       });
     }
 
-    const csvText = await fs.readFile(file.path, "utf8");
+    const csvText = file.buffer.toString("utf8");
     const row = parseSingleRowCsv(csvText);
 
     // Must match logged-in user national_id to prevent mixing users.
