@@ -1,10 +1,10 @@
 const { handlePrismaError } = require("./prismaErrors");
 
 const notFoundHandler = (req, res, next) => {
-  res.status(404).json({ 
-    success: false, 
-    error: "Route not found",
-    details: []
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+    errors: [],
   });
 };
 
@@ -14,14 +14,13 @@ const globalErrorHandler = (err, req, res, next) => {
   // If Prisma error was handled, don't send another response
   if (handlePrismaError(err, res)) return;
 
-  // Generic server error fallback
   const statusCode = err.status || err.statusCode || 500;
-  const errorMsg = statusCode === 500 ? "Internal Server Error" : err.message;
+  const message = statusCode === 500 ? "Internal Server Error" : err.message || "Error";
 
   res.status(statusCode).json({
     success: false,
-    error: errorMsg,
-    details: process.env.NODE_ENV === "development" ? [{ stack: err.stack }] : [],
+    message,
+    errors: process.env.NODE_ENV === "development" ? [{ stack: err.stack }] : [],
   });
 };
 

@@ -12,8 +12,8 @@ const handlePrismaError = (err, res) => {
       const fields = err.meta?.target ?? ["field"];
       return res.status(409).json({
         success: false,
-        error: `A record with this ${fields.join(", ")} already exists`,
-        details: [],
+        message: `A record with this ${fields.join(", ")} already exists`,
+        errors: [],
       });
     }
 
@@ -21,16 +21,16 @@ const handlePrismaError = (err, res) => {
     case "P2025":
       return res.status(404).json({
         success: false,
-        error: err.meta?.cause ?? "Record not found",
-        details: [],
+        message: err.meta?.cause ?? "Record not found",
+        errors: [],
       });
 
     // Foreign key constraint failed (e.g. invalid lab_id)
     case "P2003":
       return res.status(400).json({
         success: false,
-        error: `Invalid reference: the related record does not exist (field: ${err.meta?.field_name ?? "unknown"})`,
-        details: [],
+        message: `Invalid reference: the related record does not exist (field: ${err.meta?.field_name ?? "unknown"})`,
+        errors: [],
       });
 
     default:

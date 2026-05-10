@@ -25,11 +25,12 @@ router.post("/upload-csvs", authenticate, uploadMiddleware, uploadLabTestsCsvs);
 router.post("/upload-csv", authenticate, uploadSingleMiddleware, uploadLabTestCsvForUser);
 router.get("/", getLabTests);
 router.get("/me/status", authenticate, getMyLabTestStatus);
-router.get("/:id", getLabTestById);
-router.get("/patient/:national_id", getLabTestsByNationalId);
-router.get("/patient/:national_id/latest", getLatestLabTestByNationalId);
+// Static path prefixes before /:id so "patient" / "lab" are not treated as ids
 router.get("/patient/:national_id/status", getLabTestStatusByNationalId);
+router.get("/patient/:national_id/latest", getLatestLabTestByNationalId);
+router.get("/patient/:national_id", getLabTestsByNationalId);
 router.get("/lab/:lab_id", getLabTestsByLabId);
+router.get("/:id", getLabTestById);
 router.put("/:id", authenticate, validate(labTestUpdateSchema), updateLabTest);
 router.delete("/:id", authenticate, deleteLabTest);
 

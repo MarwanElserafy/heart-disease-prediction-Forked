@@ -58,33 +58,6 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-// Optional: Middleware to check if user is admin (if you add role field later)
-const authorize = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized"
-      });
-    }
-
-    // If roles array is empty, allow all authenticated users
-    if (roles.length === 0) {
-      return next();
-    }
-
-    // Check if user role is in allowed roles
-    // This is optional - you can add role field to User model later
-    // if (roles.includes(req.user.role)) {
-    //   return next();
-    // }
-
-    // For now, allow all authenticated users
-    next();
-  };
-};
-
 module.exports = {
   authenticate,
-  authorize
 };

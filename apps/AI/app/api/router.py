@@ -1,9 +1,8 @@
 from fastapi import APIRouter
-from api.endpoints import users, predict, shap, report
+
+from api.endpoints import internal_gateway
 
 api_router = APIRouter()
 
-api_router.include_router(users.router)
-api_router.include_router(predict.router)
-api_router.include_router(shap.router)
-api_router.include_router(report.router)
+# All ML / prediction / SHAP / report traffic must go through the Node gateway + X-INTERNAL-API-KEY
+api_router.include_router(internal_gateway.router)

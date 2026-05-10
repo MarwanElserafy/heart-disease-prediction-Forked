@@ -13,6 +13,7 @@ if (!process.env.DATABASE_URL) {
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const prisma = require("./config/prisma");
 
 // التأكد من وجود المتغيرات المطلوبة
@@ -21,12 +22,29 @@ if (!process.env.JWT_SECRET || String(process.env.JWT_SECRET).trim() === "") {
   process.exit(1);
 }
 
+if (!process.env.INTERNAL_API_KEY || String(process.env.INTERNAL_API_KEY).trim() === "") {
+  console.warn("WARN: INTERNAL_API_KEY is missing — prediction routes will fail until set.");
+}
+
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || true,
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: Number(process.env.RATE_LIMIT_MAX) || 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/api", apiLimiter);
 
 // Request logging
 app.use((req, res, next) => {
@@ -40,6 +58,7 @@ app.use("/api/users", require("./routes/userRoute"));
 app.use("/api/labs", require("./routes/labRoute"));
 app.use("/api/labtests", require("./routes/labtestRoute"));
 app.use("/api/hospitals", require("./routes/hospitalRoute"));
+app.use("/api/predictions", require("./routes/predictionRoute"));
 
 const { notFoundHandler, globalErrorHandler } = require("./middlewares/errorMiddleware");
 

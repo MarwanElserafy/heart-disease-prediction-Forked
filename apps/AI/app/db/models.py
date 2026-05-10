@@ -51,6 +51,7 @@ class Prediction(Base):
     __tablename__ = "predictions"
 
     id = Column(String, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=True)
     lab_test_id = Column(String, ForeignKey("lab_tests.id"), unique=True)
     
     prediction_result = Column(Integer, nullable=True)
