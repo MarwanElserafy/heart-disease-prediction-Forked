@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+
 import logo from "../../Image/logo.png";
 import profile from "../../Image/profile.png";
 import "./Navbar.css";
@@ -8,19 +9,15 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ state تسجيل الدخول
   const [isLogged, setIsLogged] = useState(false);
 
-  // ✅ تحديد الصفحات
   const isProfilePage = location.pathname === "/profile";
 
-  // ✅ check login
   useEffect(() => {
     const user = localStorage.getItem("user");
     setIsLogged(!!user);
   }, [location.pathname]);
 
-  // ✅ logout
   const handleLogout = () => {
     localStorage.clear();
     setIsLogged(false);
@@ -29,6 +26,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar navbar-expand-lg px-4 py-2">
+
       {/* Logo */}
       <div className="d-flex align-items-center gap-2">
         <img src={logo} className="logo" alt="logo" />
@@ -50,33 +48,26 @@ export default function Navbar() {
         className="collapse navbar-collapse justify-content-between"
         id="navbarContent"
       >
+
         {/* Links */}
         <ul className="navbar-nav mx-auto text-center gap-lg-4">
           <li className="nav-item">
-            <Link className="nav-link" to="/home">
-              HOME
-            </Link>
+            <Link className="nav-link" to="/home">HOME</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/docs">
-              DOCS
-            </Link>
+            <Link className="nav-link" to="/docs">DOCS</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/heart">
-              HEART
-            </Link>
+            <Link className="nav-link" to="/heart">HEART</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/about">
-              ABOUT
-            </Link>
+            <Link className="nav-link" to="/about">ABOUT</Link>
           </li>
         </ul>
 
         {/* Buttons */}
         <div className="d-flex justify-content-center gap-2 mt-3 mt-lg-0">
-          {/* ❌ لو مش عامل login */}
+
           {!isLogged ? (
             <>
               <button
@@ -94,7 +85,6 @@ export default function Navbar() {
               </button>
             </>
           ) : isProfilePage ? (
-            /* ✅ لو في صفحة البروفايل */
             <button
               onClick={handleLogout}
               className="custom-btn-outline rounded-pill px-4 py-2"
@@ -102,7 +92,6 @@ export default function Navbar() {
               Logout
             </button>
           ) : (
-            /* ✅ باقي الصفحات */
             <>
               <button
                 onClick={() => navigate("/profile")}
@@ -120,6 +109,7 @@ export default function Navbar() {
               </button>
             </>
           )}
+
         </div>
       </div>
     </nav>

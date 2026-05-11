@@ -46,44 +46,33 @@ const Register = () => {
 
   const navigate = useNavigate();
 
-  // ===== HANDLE CHANGE =====
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ===== VALIDATION =====
   const validate = () => {
     const err = {};
 
-    if (!form.email) {
-      err.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+    if (!form.email) err.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(form.email))
       err.email = "Invalid email format";
-    }
 
-    if (!form.nationalId) {
-      err.nationalId = "National ID is required";
-    } else if (!/^\d{14}$/.test(form.nationalId)) {
-      err.nationalId = "National ID must be exactly 14 digits";
-    }
+    if (!form.nationalId) err.nationalId = "National ID is required";
+    else if (!/^\d{14}$/.test(form.nationalId))
+      err.nationalId = "Must be 14 digits";
 
-    if (!form.username) {
-      err.username = "Username is required";
-    } else if (form.username.length < 3) {
-      err.username = "Username must be at least 3 characters";
-    }
+    if (!form.username) err.username = "Username is required";
+    else if (form.username.length < 3)
+      err.username = "Min 3 characters";
 
-    if (!form.password) {
-      err.password = "Password is required";
-    } else if (form.password.length < 6) {
-      err.password = "Password must be at least 6 characters";
-    }
+    if (!form.password) err.password = "Password is required";
+    else if (form.password.length < 6)
+      err.password = "Min 6 characters";
 
     setErrors(err);
     return Object.keys(err).length === 0;
   };
 
-  // ===== REGISTER API =====
   const handleRegister = async () => {
     if (!validate()) return;
 
@@ -100,19 +89,17 @@ const Register = () => {
         }
       );
 
-      // save token
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
 
       setErrors({});
       navigate("/login");
-
     } catch (error) {
       setErrors({
         api:
           error.response?.data?.message ||
-          "Something went wrong, try again later",
+          "Something went wrong",
       });
     } finally {
       setLoading(false);
@@ -128,7 +115,7 @@ const Register = () => {
           className="register-image-side"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)),
+              linear-gradient(rgba(0,0,0,0.12), rgba(0,0,0,0.12)),
               url(${heartImg})
             `,
           }}

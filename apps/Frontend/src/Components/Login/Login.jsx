@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import axios from "axios";
 import "./Login.css";
+
 import heartImg from "../../assets/heartLog.png";
 import logo from "../../assets/Logo.png";
+
 import { FaUser, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+
+import axios from "axios";
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -17,26 +20,35 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  // ===== VALIDATION =====
+  // validation
   const validate = (name, value) => {
     let error = "";
 
     if (name === "username") {
-      if (!value) error = "Username is required";
+      if (!value.trim()) {
+        error = "Username is required";
+      }
     }
 
     if (name === "password") {
-      if (!value) error = "Password is required";
+      if (!value.trim()) {
+        error = "Password is required";
+      } else if (value.length < 6) {
+        error = "Password must be at least 6 characters";
+      }
     }
 
     return error;
   };
 
-  // ===== HANDLE CHANGE =====
+  // onChange
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
     const error = validate(name, value);
 
@@ -46,7 +58,7 @@ const Login = () => {
     }));
   };
 
-  // ===== HANDLE BLUR =====
+  // onBlur
   const handleBlur = (e) => {
     const { name, value } = e.target;
 
@@ -58,7 +70,7 @@ const Login = () => {
     }));
   };
 
-  // ===== LOGIN =====
+  // submit
   const handleLogin = async () => {
     const usernameError = validate("username", form.username);
     const passwordError = validate("password", form.password);
@@ -68,11 +80,17 @@ const Login = () => {
         username: usernameError,
         password: passwordError,
       });
+
       return;
     }
 
     try {
       setLoading(true);
+
+      console.log("Sending Data => ", {
+        username: form.username,
+        password: form.password,
+      });
 
       const res = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -82,20 +100,30 @@ const Login = () => {
         }
       );
 
+      console.log("SUCCESS => ", res.data);
+
       const { token, data } = res.data;
 
-      // ✅ save auth data
+      // save token
       if (token) {
         localStorage.setItem("token", token);
       }
 
+      // save user
       localStorage.setItem("user", JSON.stringify(data));
 
+      // clear errors
       setErrors({});
+
+      // navigate
       navigate("/the_general");
 
     } catch (err) {
+
+      console.log("FULL ERROR => ", err.response?.data);
+
       const backendError =
+        err.response?.data?.details?.[0]?.message ||
         err.response?.data?.message ||
         err.response?.data?.error ||
         "Login failed";
@@ -122,6 +150,7 @@ const Login = () => {
 
             {/* Username */}
             <div className="input-group">
+
               <input
                 type="text"
                 name="username"
@@ -130,14 +159,20 @@ const Login = () => {
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
+
               <FaUser className="input-icon" />
+
               {errors.username && (
-                <span className="error">{errors.username}</span>
+                <span className="error">
+                  {errors.username}
+                </span>
               )}
+
             </div>
 
             {/* Password */}
             <div className="input-group">
+
               <input
                 type="password"
                 name="password"
@@ -146,12 +181,18 @@ const Login = () => {
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
+
               <FaLock className="input-icon" />
+
               {errors.password && (
-                <span className="error">{errors.password}</span>
+                <span className="error">
+                  {errors.password}
+                </span>
               )}
+
             </div>
 
+            {/* Button */}
             <button
               className="btn-gradient"
               onClick={handleLogin}
@@ -160,9 +201,12 @@ const Login = () => {
               {loading ? "Logging in..." : "Log In"}
             </button>
 
+            {/* Register */}
             <div className="register-link">
               Don't have an account?{" "}
-              <Link to="/register">Register Now</Link>
+              <Link to="/register">
+                Register Now
+              </Link>
             </div>
 
           </div>
@@ -172,12 +216,22 @@ const Login = () => {
         <div
           className="login-right"
           style={{
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url(${heartImg})`,
+            backgroundImage: `linear-gradient(
+              rgba(0,0,0,0.25),
+              rgba(0,0,0,0.25)
+            ), url(${heartImg})`,
           }}
         >
           <div className="logo-title-wrapper">
-            <img src={logo} className="logo" alt="logo" />
+
+            <img
+              src={logo}
+              className="logo"
+              alt="logo"
+            />
+
             <h1>Heart Diseases</h1>
+
           </div>
         </div>
 

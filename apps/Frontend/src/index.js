@@ -5,6 +5,7 @@ import App from "./App";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import 'bootstrap/dist/css/bootstrap.min.css';
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@600&display=swap" rel="stylesheet">npm install react-bootstrap-icons</link>
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

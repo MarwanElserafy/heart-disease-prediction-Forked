@@ -113,24 +113,20 @@ body{
 
 .form-content h2{
   text-align: center;
+
   color: #21596a;
 
   font-size: 28px;
   font-weight: 700;
 
-  margin-bottom: 25px;
-}
-
-/* ===== INPUT WRAPPER ===== */
-
-.input-wrapper{
-  margin-bottom: 12px;
+  margin-bottom: 35px;
 }
 
 /* ===== INPUT ===== */
 
 .input-group{
   position: relative;
+  margin-bottom: 18px;
 }
 
 .input-group input{
@@ -147,16 +143,12 @@ body{
   outline: none;
 
   font-size: 14px;
-
-  transition: 0.2s;
 }
 
 .input-group input:focus{
   border-color: #1198B7;
-  box-shadow: 0 0 0 2px rgba(17,152,183,0.1);
 }
 
-/* ICON */
 .input-icon{
   position: absolute;
 
@@ -196,15 +188,11 @@ body{
   transform: translateY(-1px);
 }
 
-.create-btn:disabled{
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
 /* ===== LOGIN ===== */
 
 .login-text{
   margin-top: 14px;
+
   text-align: center;
 
   font-size: 13px;
@@ -217,21 +205,17 @@ body{
   font-weight: 600;
 }
 
-/* ===== ERROR STYLES (NEW) ===== */
+/* ===== ERROR ===== */
 
 .error-text{
   font-size: 12px;
   color: #e74c3c;
   margin-top: 4px;
-  margin-left: 2px;
   display: block;
-
-  animation: fadeIn 0.2s ease-in;
 }
 
 .error-border input{
   border: 1px solid #e74c3c !important;
-  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.08);
 }
 
 .api-error{
@@ -245,8 +229,6 @@ body{
   margin-bottom: 15px;
 
   border-left: 4px solid #e74c3c;
-
-  animation: fadeIn 0.25s ease-in;
 }
 
 /* ===== ANIMATION ===== */

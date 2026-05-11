@@ -19,7 +19,6 @@ import { AuthProvider } from "./Context/AuthContext";
 export default function App() {
   const location = useLocation();
 
-  // ================= UI CONTROL =================
   const hideNavbar =
     location.pathname === "/login" ||
     location.pathname === "/register";
@@ -33,10 +32,10 @@ export default function App() {
     <AuthProvider>
       <div className="app-container">
 
-        {/* ================= NAVBAR ================= */}
+        {/* NAVBAR */}
         {!hideNavbar && <Navbar />}
 
-        {/* ================= PAGE CONTENT ================= */}
+        {/* PAGE CONTENT */}
         <div className="page-content">
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
@@ -55,7 +54,7 @@ export default function App() {
           </Routes>
         </div>
 
-        {/* ================= FOOTER ================= */}
+        {/* FOOTER */}
         {!hideFooter && <Footer />}
 
       </div>
