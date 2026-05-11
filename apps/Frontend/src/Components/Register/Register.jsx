@@ -1,151 +1,212 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import "./Register.css";
-<<<<<<< Updated upstream
+
 import heartImg from "../../assets/heart.png";
 import logo from "../../assets/Logo.png";
+
 import { FaUser, FaEnvelope, FaLock, FaIdCard } from "react-icons/fa";
-=======
+import { Link, useNavigate } from "react-router-dom";
 
-import heartImg from "../../assets/heart.png";
-import logo from "../../assets/Logo.png";
-
-import {
-  FaUser,
-  FaEnvelope,
-  FaLock,
-  FaIdCard,
-} from "react-icons/fa";
-
->>>>>>> Stashed changes
-import { Link } from "react-router-dom";
+// ===== INPUT COMPONENT =====
+const Input = ({
+  icon: Icon,
+  name,
+  type,
+  placeholder,
+  value,
+  onChange,
+  error,
+}) => (
+  <div className="input-wrapper">
+    <div className={`input-group ${error ? "error-border" : ""}`}>
+      <input
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+      />
+      <Icon className="input-icon" />
+    </div>
+    {error && <span className="error-text">{error}</span>}
+  </div>
+);
 
 const Register = () => {
+  const [form, setForm] = useState({
+    email: "",
+    nationalId: "",
+    username: "",
+    password: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  // ===== HANDLE CHANGE =====
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // ===== VALIDATION =====
+  const validate = () => {
+    const err = {};
+
+    if (!form.email) {
+      err.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+      err.email = "Invalid email format";
+    }
+
+    if (!form.nationalId) {
+      err.nationalId = "National ID is required";
+    } else if (!/^\d{14}$/.test(form.nationalId)) {
+      err.nationalId = "National ID must be exactly 14 digits";
+    }
+
+    if (!form.username) {
+      err.username = "Username is required";
+    } else if (form.username.length < 3) {
+      err.username = "Username must be at least 3 characters";
+    }
+
+    if (!form.password) {
+      err.password = "Password is required";
+    } else if (form.password.length < 6) {
+      err.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(err);
+    return Object.keys(err).length === 0;
+  };
+
+  // ===== REGISTER API =====
+  const handleRegister = async () => {
+    if (!validate()) return;
+
+    try {
+      setLoading(true);
+
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        {
+          email: form.email,
+          national_id: form.nationalId,
+          username: form.username,
+          password: form.password,
+        }
+      );
+
+      // save token
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
+      setErrors({});
+      navigate("/login");
+
+    } catch (error) {
+      setErrors({
+        api:
+          error.response?.data?.message ||
+          "Something went wrong, try again later",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-<<<<<<< Updated upstream
-    <div className="container-fluid register-container p-0">
-
-      <div className="row register-card w-10 g-4 ">
-
-        {/* LEFT SIDE */}
-        <div
-          className="col-lg-4 col-12 left-side"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url(${heartImg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="logo-title-wrapper">
-            <img src={logo} alt="logo" className="logo" />
-=======
     <div className="register-page">
-
-      
-
       <div className="register-card">
 
-        {/* LEFT IMAGE SIDE */}
+        {/* LEFT SIDE */}
         <div
           className="register-image-side"
           style={{
             backgroundImage: `
-              linear-gradient(
-                rgba(0,0,0,0.12),
-                rgba(0,0,0,0.12)
-              ),
+              linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)),
               url(${heartImg})
             `,
           }}
         >
           <div className="brand">
             <img src={logo} alt="logo" className="brand-logo" />
->>>>>>> Stashed changes
             <h1>Heart Diseases</h1>
           </div>
         </div>
 
-<<<<<<< Updated upstream
         {/* RIGHT SIDE */}
-        <div className="col-lg-8 col-12 right-side">
-
-          <div className="register-content">
-
-            <h2>egister Page</h2>
-
-=======
-        {/* RIGHT FORM SIDE */}
         <div className="register-form-side">
-
           <div className="form-content">
 
-            <h2>Register Page</h2>
+            <h2>Create Account</h2>
 
-            {/* EMAIL */}
->>>>>>> Stashed changes
-            <div className="input-group">
-              <input type="email" placeholder="Email" />
-              <FaEnvelope className="input-icon" />
-            </div>
+            {errors.api && (
+              <div className="api-error">{errors.api}</div>
+            )}
 
-<<<<<<< Updated upstream
-            <div className="input-group">
-              <input type="text" placeholder="National ID" />
-              <FaIdCard className="input-icon" />
-            </div>
+            <Input
+              icon={FaEnvelope}
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              error={errors.email}
+            />
 
-=======
-            {/* NATIONAL ID */}
-            <div className="input-group">
-              <input type="text" placeholder="National Id" />
-              <FaIdCard className="input-icon" />
-            </div>
+            <Input
+              icon={FaIdCard}
+              name="nationalId"
+              type="text"
+              placeholder="National ID"
+              value={form.nationalId}
+              onChange={handleChange}
+              error={errors.nationalId}
+            />
 
-            {/* USERNAME */}
->>>>>>> Stashed changes
-            <div className="input-group">
-              <input type="text" placeholder="Username" />
-              <FaUser className="input-icon" />
-            </div>
+            <Input
+              icon={FaUser}
+              name="username"
+              type="text"
+              placeholder="Username"
+              value={form.username}
+              onChange={handleChange}
+              error={errors.username}
+            />
 
-<<<<<<< Updated upstream
-=======
-            {/* PASSWORD */}
->>>>>>> Stashed changes
-            <div className="input-group">
-              <input type="password" placeholder="Password" />
-              <FaLock className="input-icon" />
-            </div>
+            <Input
+              icon={FaLock}
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              error={errors.password}
+            />
 
-<<<<<<< Updated upstream
-            <button className="btn-gradient">
-              Create Account
-            </button>
-
-            <div className="login-link">
-              Already have an account?{" "}
-              <Link to="/login">Login</Link>
-            </div>
-=======
-            <button className="create-btn">
-              Create Account
+            <button
+              className="create-btn"
+              onClick={handleRegister}
+              disabled={loading}
+            >
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
 
             <p className="login-text">
               Already Have An Account?
               <Link to="/login"> Log In</Link>
             </p>
->>>>>>> Stashed changes
 
           </div>
-
         </div>
 
       </div>
-<<<<<<< Updated upstream
-    // </div>
-=======
     </div>
->>>>>>> Stashed changes
   );
 };
 

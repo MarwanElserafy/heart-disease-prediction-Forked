@@ -44,28 +44,49 @@ body {
 
   padding: 40px;
   box-sizing: border-box;
+
+  position: relative;   /* 👈 مهم */
+  overflow: hidden;     /* 👈 مهم */
+}
+
+/* ================= LIGHT EFFECT ================= */
+.login-left::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: radial-gradient(
+    circle at top left,
+    rgba(17,152,183,0.18),
+    transparent 45%
+  );
+
+  z-index: 0;
+}
+
+/* content فوق المؤثر */
+.login-content {
+  width: 100%;
+  max-width: 320px;
+  position: relative;
+  z-index: 2;
 }
 
 /* ================= RIGHT SIDE ================= */
 .login-right {
-  flex: 1;
+  width: 35%;
 
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 10px;
+
+  position: relative;
 
   display: flex;
   align-items: flex-start;
 
-  padding: 40px;
-  color: white;
-}
-
-/* ================= CONTENT ================= */
-.login-content {
-  width: 100%;
-  max-width: 320px;
+  padding: 25px;
+  border-radius: 10px;
 }
 
 /* ================= TITLE ================= */
@@ -163,8 +184,9 @@ body {
   font-size: 28px;
   font-weight: 800;
   color: #0f4c5c;
-
 }
+
+/* ================= RESPONSIVE ================= */
 @media (max-width: 992px) {
   .login-card {
     flex-direction: column !important;

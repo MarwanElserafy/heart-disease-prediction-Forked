@@ -1,12 +1,6 @@
 /* خلفية السيكشن */
 .steps-wrapper {
- background: linear-gradient(
-    to right,
-    rgba(78, 160, 177, 0.3) 0%,
-    #ffffff 10%,
-    #ffffff 90%,
-    rgba(17, 152, 183, 0.3) 100%
-  );
+ 
 
   display: flex;
   justify-content: center;  /* يوسّط أفقي */

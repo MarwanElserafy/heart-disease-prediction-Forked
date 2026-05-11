@@ -4,12 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-<<<<<<< Updated upstream
-import "bootstrap/dist/css/bootstrap.min.css";
-=======
 import 'bootstrap/dist/css/bootstrap.min.css';
->>>>>>> Stashed changes
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@600&display=swap" rel="stylesheet">npm install react-bootstrap-icons</link>
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

@@ -1,50 +1,38 @@
-<<<<<<< Updated upstream
-import React from "react";
-=======
 import React, { useState } from "react";
->>>>>>> Stashed changes
+import axios from "axios";
 import "./Login.css";
 import heartImg from "../../assets/heartLog.png";
 import logo from "../../assets/Logo.png";
 import { FaUser, FaLock } from "react-icons/fa";
-<<<<<<< Updated upstream
-import { Link } from "react-router-dom";
-
-const Login = () => {
-=======
 import { Link, useNavigate } from "react-router-dom";
 
-  const Login = () => {
+const Login = () => {
   const [form, setForm] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  // ✅ validation
+  // ===== VALIDATION =====
   const validate = (name, value) => {
     let error = "";
 
-    if (name === "email") {
-      if (!value) {
-        error = "Email is required";
-      } else if (!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(value)) {
-        error = "Invalid email format";
-      }
+    if (name === "username") {
+      if (!value) error = "Username is required";
     }
 
     if (name === "password") {
-      if (!value) {
-        error = "Password is required";
-      }
+      if (!value) error = "Password is required";
     }
 
     return error;
   };
 
-  // onChange
+  // ===== HANDLE CHANGE =====
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -58,7 +46,7 @@ import { Link, useNavigate } from "react-router-dom";
     }));
   };
 
-  // onBlur
+  // ===== HANDLE BLUR =====
   const handleBlur = (e) => {
     const { name, value } = e.target;
 
@@ -70,35 +58,57 @@ import { Link, useNavigate } from "react-router-dom";
     }));
   };
 
-  // submit
-  const handleLogin = () => {
-    const emailError = validate("email", form.email);
+  // ===== LOGIN =====
+  const handleLogin = async () => {
+    const usernameError = validate("username", form.username);
     const passwordError = validate("password", form.password);
 
-    if (emailError || passwordError) {
+    if (usernameError || passwordError) {
       setErrors({
-        email: emailError,
+        username: usernameError,
         password: passwordError,
       });
       return;
     }
 
-    // 🔴 هنا الباك إند بعدين
-    /*
-    لو الباسورد غلط:
-    setErrors({ password: "Incorrect password" });
+    try {
+      setLoading(true);
 
-    لو الإيميل مش موجود:
-    setErrors({ email: "User not found" });
-    */
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          username: form.username,
+          password: form.password,
+        }
+      );
 
-    // ✅ مؤقت
-    localStorage.setItem("user", "true");
-    localStorage.setItem("type", "risk");
+      const { token, data } = res.data;
 
-    navigate("/the_general");
+      // ✅ save auth data
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+
+      localStorage.setItem("user", JSON.stringify(data));
+
+      setErrors({});
+      navigate("/the_general");
+
+    } catch (err) {
+      const backendError =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Login failed";
+
+      setErrors({
+        password: backendError,
+      });
+
+    } finally {
+      setLoading(false);
+    }
   };
->>>>>>> Stashed changes
+
   return (
     <div className="login-container">
 
@@ -107,23 +117,54 @@ import { Link, useNavigate } from "react-router-dom";
         {/* LEFT SIDE */}
         <div className="login-left">
           <div className="login-content">
+
             <h2>Login Page</h2>
 
+            {/* Username */}
             <div className="input-group">
-              <input type="text" placeholder="Username" />
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={form.username}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
               <FaUser className="input-icon" />
+              {errors.username && (
+                <span className="error">{errors.username}</span>
+              )}
             </div>
 
+            {/* Password */}
             <div className="input-group">
-              <input type="password" placeholder="Password" />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={form.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
               <FaLock className="input-icon" />
+              {errors.password && (
+                <span className="error">{errors.password}</span>
+              )}
             </div>
 
-            <button className="btn-gradient">Log In</button>
+            <button
+              className="btn-gradient"
+              onClick={handleLogin}
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Log In"}
+            </button>
 
             <div className="register-link">
-              Don't have an account? <Link to="/register">Register Now</Link>
+              Don't have an account?{" "}
+              <Link to="/register">Register Now</Link>
             </div>
+
           </div>
         </div>
 

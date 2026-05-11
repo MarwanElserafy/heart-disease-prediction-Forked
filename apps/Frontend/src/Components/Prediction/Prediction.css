@@ -8,13 +8,7 @@ body {
 .prediction-page {
   min-height: 100vh;
 
-  background: linear-gradient(
-    to right,
-    rgba(78, 160, 177, 0.3) 0%,
-    #ffffff 10%,
-    #ffffff 90%,
-    rgba(17, 152, 183, 0.3) 100%
-  );
+ 
 
   display: flex;
   justify-content: center;  /* يوسّط أفقي */
@@ -33,11 +27,7 @@ body {
 
 /* TITLE */
 .prediction-card h1 {
-<<<<<<< Updated upstream
-  font-weight: 600;
-=======
   font-weight: 800;
->>>>>>> Stashed changes
   font-size: 48px;
   letter-spacing: 0.08em;
   margin-bottom: 15px;
@@ -347,8 +337,6 @@ color: transparent;
     max-width: 100%;
     height: auto;
   }
-<<<<<<< Updated upstream
-=======
 }
 @media (max-width: 1024px) {
 
@@ -435,5 +423,4 @@ color: transparent;
   .info-text {
     font-size: 20px;
   }
->>>>>>> Stashed changes
 }

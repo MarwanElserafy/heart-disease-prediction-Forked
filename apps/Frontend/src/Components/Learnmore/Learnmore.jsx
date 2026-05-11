@@ -1,10 +1,6 @@
 import React from "react";
 import"./Learnmore.css"
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 const StepsSection = () => {
   return (
     <div className="steps-wrapper text-center py-5">

@@ -2,42 +2,13 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../Pages/Home.css";
 
-<<<<<<< Updated upstream
-export default function App() {
-=======
 export default function Home() {
 
->>>>>>> Stashed changes
   return (
     <div className="page">
 
       <div className="main container-fluid p-0">
 
-<<<<<<< Updated upstream
-        {/* Hero Section */}
-        <div className="content">
-
-          {/* Text */}
-          <div className="text">
-            <h2>Heart Disease Prediction Tool</h2>
-
-            <p>
-              Advanced AI-Powered Analysis <br />
-              To Assess Your Heart Health <br />
-              Risk Factors
-            </p>
-          </div>
-
-          {/* Corner Shape */}
-          <div className="corner">
-            <div className="info-box">
-              <p>Your Heart Is Your Life</p>
-              <button className="know-btn">Know More →</button>
-            </div>
-          </div>
-
-        </div>
-=======
         <div className="content">
 
           {/* ================= TEXT ================= */}
@@ -116,7 +87,6 @@ export default function Home() {
 
         </div>
 
->>>>>>> Stashed changes
       </div>
 
     </div>

@@ -66,19 +66,6 @@ function Home() {
       {/* Hospitals Section */}
       <section className="hospitals-section">
         {/* Alexandria */}
-<<<<<<< Updated upstream
-        <div className="city-title position-relative">
-          <h5 className="city-tittle">Alexandria</h5>
-        </div>
-        <div className="hospitals-container">
-          <div>
-            <a
-              href="https://www.google.com/maps?q=31.1716947,29.9435354"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hospital-card me-2 "
-            >
-=======
         <div className="city-box position-relative">
   <h5 className="city-title">Alexandria</h5>
 </div>
@@ -90,7 +77,6 @@ function Home() {
             rel="noopener noreferrer"
             className="hospital-card me-2"
            >
->>>>>>> Stashed changes
               <p className="hospital-name text-center">Elite Hospital</p>
               <div className="d-flex align-items-center justify-content-center gap-2  mb-2 location">
                 <img src={location_icon} className="location_icon" />
@@ -147,15 +133,9 @@ function Home() {
         </div>
 
         {/* Cairo */}
-<<<<<<< Updated upstream
-        <div className="city-title position-relative px-5">
-          <h5 className="city-tittle">Cairo</h5>
-        </div>
-=======
        <div className="city-box position-relative">
   <h5 className="city-title">Cairo</h5>
 </div>
->>>>>>> Stashed changes
 
         <div className="hospitals-container">
           <div>
