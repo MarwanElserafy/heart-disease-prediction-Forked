@@ -1,442 +1,150 @@
-# Heart Disease Prediction — Backend API (Frontend Integration)
+# Heart Disease Prediction — Frontend API Guide
 
-This document describes the **Node.js API** the frontend must use.  
-**Do not call the Python/FastAI service (port `8000`) from the browser** — ML, SHAP, and PDF reports are only reachable through these gateway routes.
+Welcome! This guide is designed to help frontend developers (React, Vue, HTML/JS) connect to the Heart Disease Prediction Backend. We have kept things simple and straightforward.
 
-**Default base URL (local):** `http://localhost:5000`  
-(Production: replace with your deployed API origin.)
+**Base URL:** `http://localhost:5000` (Use this when running the project locally on your machine).
+
+> **Beginner Tip:** You only need to talk to the Node.js server running on port `5000`. The Node.js server will handle talking to the AI model behind the scenes. Never try to call the Python AI server (port `8000`) directly from your frontend code.
 
 ---
 
-## 1. Conventions
+## 1. The Big Picture (How the app works)
 
-### 1.1 Authentication (JWT)
+Here is the exact journey a user takes in your frontend app, and the APIs you need to call at each step:
 
-Most user-facing write operations and predictions require a **Bearer token** from login/register.
+1. **Create an Account / Login:** The user registers or logs in. The backend gives you a "Token" (like a digital ID card).
+2. **Check Lab Tests:** You ask the backend, "Does this user have any lab tests uploaded?"
+3. **Upload Data:** If they don't have tests, you let them upload a CSV file with their medical data.
+4. **Predict Risk:** You tell the backend to run the AI prediction on their latest data.
+5. **Show Results:** 
+   - If the risk is **Low**, you just show them a happy message.
+   - If the risk is **High**, you show them the AI Explanation Image (SHAP), a downloadable PDF Medical Report, and a list of nearby hospitals.
 
-```http
-Authorization: Bearer <token>
-```
+---
 
-- Token payload includes `userId` (server-side user id / CUID).
-- Expiry is configured on the server (`JWT_EXPIRE`, often `30d`).
-- **401** if missing, invalid, or expired.
+## 2. Authentication (Logging In)
 
-### 1.2 Admin key (hospitals only)
+Most of our APIs require the user to be logged in. When a user logs in, the backend sends back a `token`. You must send this token in the **Headers** of almost every request you make.
 
-Creating/updating/deleting **hospitals** requires:
-
-```http
-x-admin-key: <ADMIN_API_KEY>
-```
-
-Value must match `ADMIN_API_KEY` in the backend `.env`. Use only for trusted admin/seed tools — **not** in public frontend builds.
-
-### 1.3 Success response (typical)
-
-```json
-{
-  "success": true,
-  "message": "…",
-  "data": { }
-}
-```
-
-Lists often include pagination:
-
-```json
-{
-  "success": true,
-  "data": [ ],
-  "pagination": {
-    "page": 1,
-    "limit": 10,
-    "total": 100,
-    "totalPages": 10
+**How to send the token in JavaScript (Fetch API example):**
+```javascript
+fetch('http://localhost:5000/api/some-endpoint', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer YOUR_TOKEN_HERE',
+    'Content-Type': 'application/json'
   }
+})
+```
+
+### Register a New User
+- **Endpoint:** `POST /api/auth/register`
+- **What to send (Body):** `national_id` (14 digits), `username`, `email`, `password` (min 6 chars).
+- **What you get back:** User info and the `token`. Save this token!
+
+### Login an Existing User
+- **Endpoint:** `POST /api/auth/login`
+- **What to send (Body):** `username`, `password`.
+- **What you get back:** User info and the `token`.
+
+---
+
+## 3. The Core Journey (Labs & Predictions)
+
+Make sure you include the `Authorization: Bearer <token>` header for all these requests!
+
+### Step A: Check if the user has data
+- **Endpoint:** `GET /api/labtests/me/status`
+- **Why use this?** To know if you should show the "Upload Data" screen or the "Start Prediction" screen.
+- **What you get back:** A boolean `hasLabTests`. If it's `false`, ask them to upload data.
+
+### Step B: Upload Medical Data (CSV)
+- **Endpoint:** `POST /api/labtests/upload-csv`
+- **How to send:** Use `FormData` in JavaScript. Append the file under the key `file`.
+- **Note:** The `national_id` inside the CSV must match the logged-in user's ID.
+
+### Step C: Start the AI Prediction
+- **Endpoint:** `POST /api/predictions/start`
+- **Why use this?** This tells the AI to look at the user's latest lab test and calculate their heart disease risk.
+- **What you get back:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "prediction_id": "some-unique-id",
+      "decision": "high", 
+      "probability": 72.5,
+      "show_shap": true,
+      "show_report": true,
+      "show_hospitals": true
+    }
+  }
+  ```
+> **Beginner Tip:** Save the `prediction_id`! You will need it in the next step to get the images and reports. Also, if `decision` is "low", the `show_shap`, `show_report`, and `show_hospitals` will all be `false` (so you don't show the hospital section either).
+
+### Step D: Get AI Explanations & Reports (High Risk Only)
+If the prediction from Step C says `show_shap` is `true`, you can fetch these files.
+
+**1. Get the AI Explanation Image (SHAP)**
+- **Endpoint:** `GET /api/predictions/:id/shap` (Replace `:id` with the `prediction_id`)
+- **What you get back:** An actual PNG image file.
+- **How to use it in HTML:** You can't just put this URL in an `<img src="...">` directly because it needs the Authorization header. You have to fetch it as a "blob" in JavaScript, create an object URL, and then put that in the image tag.
+- **Error 400:** If you try to call this for a "Low Risk" patient, the server will block it and return a 400 error.
+
+**2. Get the PDF Medical Report**
+- **Endpoint:** `GET /api/predictions/:id/report`
+- **What you get back:** A downloadable PDF file. 
+- **Error 400:** Just like the image, this is blocked for "Low Risk" patients.
+
+---
+
+## 4. Hospitals (Where to go)
+
+If the user is High Risk, you might want to show them nearby hospitals.
+
+### Get a list of hospitals
+- **Endpoint:** `GET /api/hospitals`
+- **What you get back:** A list of hospitals with their names, areas, and Google Maps links.
+
+### Search hospitals by city/area
+- **Endpoint:** `GET /api/hospitals/area/:area`
+- **Example:** `GET /api/hospitals/area/Cairo`
+
+---
+
+## 5. Understanding Responses & Errors
+
+When you call our API, we always try to reply in a predictable way so your frontend code is easy to write.
+
+**A Successful Request looks like this:**
+```json
+{
+  "success": true,
+  "message": "Operation completed successfully",
+  "data": { ... } 
 }
 ```
 
-### 1.4 Error response (typical)
-
+**A Failed Request looks like this:**
 ```json
 {
   "success": false,
-  "message": "Human readable message",
-  "errors": [ ]
+  "message": "Something went wrong",
+  "errors": [ ... ]
 }
 ```
 
-In **development**, `errors` may include stack traces. In production, `errors` is usually empty.
-
-### 1.5 Validation errors (Zod)
-
-Status **400**:
-
-```json
-{
-  "success": false,
-  "error": "Validation failed",
-  "details": [
-    { "field": "body.email", "message": "…" }
-  ]
-}
-```
-
-### 1.6 Rate limiting
-
-All routes under `/api` are rate-limited (default **300 requests / 15 minutes** per IP). On limit, expect **429** (per `express-rate-limit`).
-
-### 1.7 CORS
-
-Backend uses `cors` with `credentials: true`. Set `CORS_ORIGIN` on the server to your frontend origin in production.
+**Common Status Codes you will see:**
+- `200` or `201`: Success! Everything worked.
+- `400`: Bad Request (You might have sent missing data, or asked for a PDF for a low-risk patient).
+- `401`: Unauthorized (Your token is missing, expired, or wrong. Time to log the user out!).
+- `404`: Not Found (The data doesn't exist).
+- `500` or `502`: Server Error (Something broke on our end or the AI's end).
 
 ---
 
-## 2. Auth
-
-### `POST /api/auth/register`
-
-**Body (JSON):**
-
-| Field | Type | Rules |
-|--------|------|--------|
-| `national_id` | string | Exactly **14** digits |
-| `username` | string | 2–50 chars |
-| `email` | string | Valid email |
-| `password` | string | Min **6** chars |
-
-**201 example:**
-
-```json
-{
-  "success": true,
-  "message": "User registered successfully",
-  "data": {
-    "id": "clx…",
-    "national_id": "29501010001001",
-    "username": "ahmed",
-    "email": "ahmed@example.com",
-    "createdAt": "…",
-    "updatedAt": "…"
-  },
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…"
-}
-```
-
-Store `token` (e.g. memory + `httpOnly` cookie pattern, or `localStorage` for coursework — know the XSS tradeoff).
-
----
-
-### `POST /api/auth/login`
-
-**Body (JSON):**
-
-| Field | Type |
-|--------|------|
-| `username` | string |
-| `password` | string |
-
-**200 example:** Same shape as register: `success`, `message`, `data` (user without password), `token`.
-
-**401:** Invalid credentials.
-
----
-
-## 3. Predictions (gateway — primary ML flow)
-
-All routes require **`Authorization: Bearer <token>`**.
-
-The server picks the **latest lab test** for the logged-in user’s `national_id`, runs the internal AI pipeline, and returns a **`prediction_id`** for follow-up assets.
-
-### `POST /api/predictions/start`
-
-**Body:** optional `{}` (no fields required).
-
-**201 example:**
-
-```json
-{
-  "success": true,
-  "message": "Prediction completed successfully",
-  "data": {
-    "prediction_id": "uuid-or-cuid",
-    "lab_test_id": "…",
-    "decision": "high",
-    "probability": 72.5,
-    "risk_level": "…",
-    "risk_color": "…",
-    "decision_label": "…",
-    "show_shap": true,
-    "show_report": true,
-    "show_hospitals": true
-  }
-}
-```
-
-For **low** risk, `show_shap`, `show_report`, and `show_hospitals` are typically **`false`** — UI can hide those sections.
-
-**404:** No lab test exists for this user’s national ID.
-
-**502 / 5xx:** AI service or internal error — show a generic error; details may be in `message`.
-
----
-
-### `GET /api/predictions/:id/shap`
-
-- **`:id`** = `prediction_id` from `POST /api/predictions/start`.
-- **Response:** raw **PNG** (`Content-Type: image/png`).
-- **403:** Prediction belongs to another user.
-- **404:** Prediction not found.
-
----
-
-### `GET /api/predictions/:id/report`
-
-- **`:id`** = `prediction_id`.
-- **Response:** **PDF** download (`Content-Type: application/pdf`).
-- **403 / 404:** Same as SHAP.
-
----
-
-## 4. Lab tests
-
-### `POST /api/labtests`
-
-**Auth:** required.
-
-**Body (JSON):**
-
-```json
-{
-  "lab_id": "<lab CUID>",
-  "national_id": "29501010001001",
-  "features": {
-    "age": 55,
-    "sex": 1,
-    "chest_pain_type": 2,
-    "resting_bp_s": 140,
-    "cholesterol": 250,
-    "fasting_blood_sugar": 0,
-    "resting_ecg": 1,
-    "max_heart_rate": 150,
-    "exercise_angina": 0,
-    "oldpeak": 1.5,
-    "st_slope": 1
-  }
-}
-```
-
-Feature constraints match Zod in `validators/labtest.schema.js` (ranges for age, BP, cholesterol, etc.).
-
-**201:** `{ "success": true, "data": { …, "features": { … }, "lab": { … } } }`
-
----
-
-### `POST /api/labtests/upload-csv`
-
-**Auth:** required.
-
-**Content-Type:** `multipart/form-data`
-
-| Field | Type | Notes |
-|--------|------|--------|
-| `file` | file | One `.csv` (preferred key) |
-| `files` | file | Alternative single file key |
-
-CSV must contain **one data row** with columns including:  
-`lab_id`, `national_id`, `lab_code`, and all feature columns (see bulk upload comment in backend).  
-**`national_id` in the CSV must match** the logged-in user’s national ID.
-
-**201 example:**
-
-```json
-{
-  "success": true,
-  "message": "Lab test CSV processed for current user",
-  "created": {
-    "id": "…",
-    "national_id": "…",
-    "lab_id": "…",
-    "lab_code": "…",
-    "file": { "originalname": "…" },
-    "data": { … }
-  }
-}
-```
-
----
-
-### `POST /api/labtests/upload-csvs`
-
-**Auth:** required.
-
-**multipart/form-data:** field **`files`**, **1–5** CSV files (max 10 MB each).
-
-Each file = one row, one patient. Used for batch/admin workflows.
-
-**201:** `created`, `failures`, `createdCount`, etc.
-
----
-
-### `GET /api/labtests`
-
-**Auth:** not required (public list).
-
-**Query:** `page`, `limit` (defaults: page 1, limit 10, max 100).
-
----
-
-### `GET /api/labtests/me/status`
-
-**Auth:** required.
-
-**200 example:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "national_id": "29501010001001",
-    "labTestsCount": 1,
-    "hasLabTests": true,
-    "recommendation": "labtests"
-  }
-}
-```
-
-If `hasLabTests` is `false`, `recommendation` is `"labs"` — UI can prompt user to pick a lab / upload flow.
-
----
-
-### `GET /api/labtests/patient/:national_id`
-
-All lab tests for a national ID (newest ordering in list implementation).
-
----
-
-### `GET /api/labtests/patient/:national_id/latest`
-
-Latest single lab test or **404**.
-
----
-
-### `GET /api/labtests/patient/:national_id/status`
-
-Count / `hasLabTests` for that national ID (no auth).
-
----
-
-### `GET /api/labtests/lab/:lab_id`
-
-All tests for a given lab.
-
----
-
-### `GET /api/labtests/:id`
-
-Single lab test by id.
-
----
-
-### `PUT /api/labtests/:id` / `DELETE /api/labtests/:id`
-
-**Auth:** required. Body for PUT uses optional `lab_id`, `national_id`, `features` (partial allowed).
-
----
-
-## 5. Labs
-
-### `POST /api/labs`
-
-**Auth:** required.  
-**Body:** `{ "name", "lab_code", "address" }`
-
-### `GET /api/labs`
-
-**Query:** `page`, `limit`.
-
-### `GET /api/labs/:id`
-
-### `PUT /api/labs/:id` / `DELETE /api/labs/:id`
-
-**Auth:** required.
-
----
-
-## 6. Hospitals
-
-### `GET /api/hospitals`
-
-**Query:** `page`, `limit`.
-
-### `GET /api/hospitals/area/:area`
-
-Case-insensitive **contains** match on `area` (define this path **before** `/:id` on the server).
-
-Example: `GET /api/hospitals/area/Cairo`
-
-### `GET /api/hospitals/:id`
-
-### `POST /api/hospitals`
-
-**Auth:** Bearer **+** `x-admin-key`.
-
-**Body:** `{ "name", "area", "google_maps_link" }` (URL must be valid).
-
-### `PUT /api/hospitals/:id` / `DELETE /api/hospitals/:id`
-
-**Auth:** Bearer **+** `x-admin-key`.
-
----
-
-## 7. Users (CRUD)
-
-All require **Bearer** token.
-
-| Method | Path | Notes |
-|--------|------|--------|
-| `POST` | `/api/users` | Same body rules as register (national_id, username, email, password) |
-| `GET` | `/api/users` | `page`, `limit` query |
-| `GET` | `/api/users/:id` | |
-| `PUT` | `/api/users/:id` | Optional username, email, password |
-| `DELETE` | `/api/users/:id` | |
-
----
-
-## 8. Recommended frontend flow
-
-1. **Register** or **Login** → store `token`.
-2. **`GET /api/labtests/me/status`** → if no tests, show labs / upload UX.
-3. **`POST /api/labtests/upload-csv`** (or create via JSON) so `national_id` matches the user.
-4. **`POST /api/predictions/start`** → read `data.prediction_id`, `decision`, `probability`, flags.
-5. If `show_shap` / `show_report`:  
-   - `GET /api/predictions/<prediction_id>/shap` (show as image)  
-   - `GET /api/predictions/<prediction_id>/report` (open/download PDF)
-6. If high risk: **`GET /api/hospitals`** or **`GET /api/hospitals/area/<city>`** for nearby hospitals.
-
----
-
-## 9. Security checklist for frontend
-
-- Never expose **`INTERNAL_API_KEY`** or **`ADMIN_API_KEY`** in frontend code.
-- Never call **`http://127.0.0.1:8000`** (FastAPI) from the client for predict/SHAP/report.
-- Send JWT only over **HTTPS** in production.
-- Treat **`prediction_id`** as sensitive; always use with the user’s own session.
-
----
-
-## 10. Quick reference
-
-| Area | Base path |
-|------|-----------|
-| Auth | `/api/auth` |
-| Users | `/api/users` |
-| Labs | `/api/labs` |
-| Lab tests | `/api/labtests` |
-| Hospitals | `/api/hospitals` |
-| Predictions | `/api/predictions` |
-
----
-
-*Generated for frontend integration. Backend version aligns with Express routes under `apps/Backend/src/routes/`.*
+## 6. Security Rules for Frontend Developers
+
+1. **Never put Admin Keys in your frontend code.** If you see `ADMIN_API_KEY` or `INTERNAL_API_KEY` mentioned anywhere, those belong on the server, not in React/Vue.
+2. **Keep the Token Safe.** Store the JWT token securely.
+3. **Handle Errors Gracefully.** If the AI takes too long or fails (502 error), show a nice "Please try again later" message to the user instead of a blank screen.

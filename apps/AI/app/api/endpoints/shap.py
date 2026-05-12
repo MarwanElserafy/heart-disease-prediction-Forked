@@ -21,6 +21,9 @@ def show_shap(id: str, db: Session = Depends(get_db)):
     if not prediction_record:
         raise HTTPException(status_code=400, detail="Prediction not evaluated yet. Call POST /predict/{id} first.")
 
+    if prediction_record.decision == "low":
+        raise HTTPException(status_code=400, detail="SHAP image is not available for low risk predictions.")
+
     # Generate SHAP image if it doesn't exist
     if not prediction_record.shap_image:
         data = [
@@ -49,6 +52,9 @@ def get_shap_data(id: str, db: Session = Depends(get_db)):
     prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == patient.id).first()
     if not prediction_record:
         raise HTTPException(status_code=400, detail="Prediction not evaluated yet. Call POST /predict/{id} first.")
+
+    if prediction_record.decision == "low":
+        raise HTTPException(status_code=400, detail="SHAP data is not available for low risk predictions.")
 
     # Retrieve or generate SHAP data
     if prediction_record.shap_values_json:

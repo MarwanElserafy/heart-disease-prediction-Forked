@@ -39,6 +39,12 @@ def get_prediction_report(id: str, db: Session = Depends(get_db)):
             detail="Prediction has not been evaluated yet. Call POST /predict/{id} first."
         )
 
+    if prediction_record.decision == "low":
+        raise HTTPException(
+            status_code=400,
+            detail="Report PDF is not available for low risk predictions."
+        )
+
     if not prediction_record.pdf_binary:
         raise HTTPException(
             status_code=404,

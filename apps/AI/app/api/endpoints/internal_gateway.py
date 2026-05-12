@@ -120,80 +120,86 @@ def internal_predict(body: InternalTargetRequest, db: Session = Depends(get_db))
     prediction_record.decision = assessment.decision.value
     prediction_record.shap_values_json = shap_data
 
-    image_bytes = ml_service.generate_shap_image(shap_data)
-    prediction_record.shap_image = image_bytes
+    if assessment.decision.value == "high":
+        image_bytes = ml_service.generate_shap_image(shap_data)
+        prediction_record.shap_image = image_bytes
 
-    shap_tuple = tuple(sorted(shap_data.items()))
-    feat_chart = chart_service.generate_feature_importance_chart(shap_tuple)
-    shap_chart = chart_service.generate_shap_waterfall_chart(shap_tuple)
+        shap_tuple = tuple(sorted(shap_data.items()))
+        feat_chart = chart_service.generate_feature_importance_chart(shap_tuple)
+        shap_chart = chart_service.generate_shap_waterfall_chart(shap_tuple)
 
-    if consultant:
-        top_features = sorted(shap_data.items(), key=lambda x: abs(x[1]), reverse=True)[:3]
-        try:
-            llm_result = consultant.generate_report(
-                probability=assessment.probability_pct,
-                decision=assessment.decision.value,
-                ui_risk_level=assessment.risk_level.value,
-                top_features=top_features,
-            )
+        if consultant:
+            top_features = sorted(shap_data.items(), key=lambda x: abs(x[1]), reverse=True)[:3]
+            try:
+                llm_result = consultant.generate_report(
+                    probability=assessment.probability_pct,
+                    decision=assessment.decision.value,
+                    ui_risk_level=assessment.risk_level.value,
+                    top_features=top_features,
+                )
+                prediction_record.llm_report_json = llm_result
+            except Exception as e:
+                print(f"Warning: Failed to communicate with AI provider: {str(e)}")
+                llm_result = {"explanation": "LLM generation failed.", "recommendations": []}
+                prediction_record.llm_report_json = llm_result
+        else:
+            llm_result = {"explanation": "LLM Consultant is not initialized.", "recommendations": []}
             prediction_record.llm_report_json = llm_result
-        except Exception as e:
-            print(f"Warning: Failed to communicate with AI provider: {str(e)}")
-            llm_result = {"explanation": "LLM generation failed.", "recommendations": []}
-            prediction_record.llm_report_json = llm_result
+
+        patient_data = {
+            "name": patient_name,
+            "gender": "Male" if patient.sex == 1 else "Female",
+            "dob": "N/A",
+            "national_id": patient.national_id or "N/A",
+            "address": "N/A",
+            "age": patient.age,
+            "cp": patient.chest_pain_type,
+            "trestbps": patient.resting_bp_s,
+            "chol": patient.cholesterol,
+            "fbs": patient.fasting_blood_sugar,
+            "restecg": patient.resting_ecg,
+            "thalach": patient.max_heart_rate,
+            "exang": "Yes" if patient.exercise_angina == 1 else "No",
+            "oldpeak": patient.oldpeak,
+            "slope": patient.st_slope,
+        }
+
+        risk_score = (
+            round(prediction_record.prediction_percentage, 1)
+            if prediction_record.prediction_percentage
+            else 0.0
+        )
+        llm_report = {
+            "summary": llm_result.get("explanation", ""),
+            "recommendations": llm_result.get("recommendations", []),
+        }
+        images_base64 = {
+            "university_logo": "",
+            "risk_gauge": feat_chart,
+            "shap_plot": shap_chart,
+        }
+        lab_data = {
+            "name": lab_record.name if lab_record else "N/A",
+            "address": lab_record.address if lab_record else "N/A",
+        }
+        lab_test_data = {"id": patient.id}
+
+        pdf_bytes_io = generate_medical_report_pdf(
+            patient_data=patient_data,
+            risk_score=risk_score,
+            llm_report=llm_report,
+            images_base64=images_base64,
+            lab_data=lab_data,
+            lab_test_data=lab_test_data,
+        )
+
+        prediction_record.pdf_binary = pdf_bytes_io.getvalue()
+        prediction_record.report_generated_at = datetime.utcnow().isoformat()
     else:
-        llm_result = {"explanation": "LLM Consultant is not initialized.", "recommendations": []}
-        prediction_record.llm_report_json = llm_result
-
-    patient_data = {
-        "name": patient_name,
-        "gender": "Male" if patient.sex == 1 else "Female",
-        "dob": "N/A",
-        "national_id": patient.national_id or "N/A",
-        "address": "N/A",
-        "age": patient.age,
-        "cp": patient.chest_pain_type,
-        "trestbps": patient.resting_bp_s,
-        "chol": patient.cholesterol,
-        "fbs": patient.fasting_blood_sugar,
-        "restecg": patient.resting_ecg,
-        "thalach": patient.max_heart_rate,
-        "exang": "Yes" if patient.exercise_angina == 1 else "No",
-        "oldpeak": patient.oldpeak,
-        "slope": patient.st_slope,
-    }
-
-    risk_score = (
-        round(prediction_record.prediction_percentage, 1)
-        if prediction_record.prediction_percentage
-        else 0.0
-    )
-    llm_report = {
-        "summary": llm_result.get("explanation", ""),
-        "recommendations": llm_result.get("recommendations", []),
-    }
-    images_base64 = {
-        "university_logo": "",
-        "risk_gauge": feat_chart,
-        "shap_plot": shap_chart,
-    }
-    lab_data = {
-        "name": lab_record.name if lab_record else "N/A",
-        "address": lab_record.address if lab_record else "N/A",
-    }
-    lab_test_data = {"id": patient.id}
-
-    pdf_bytes_io = generate_medical_report_pdf(
-        patient_data=patient_data,
-        risk_score=risk_score,
-        llm_report=llm_report,
-        images_base64=images_base64,
-        lab_data=lab_data,
-        lab_test_data=lab_test_data,
-    )
-
-    prediction_record.pdf_binary = pdf_bytes_io.getvalue()
-    prediction_record.report_generated_at = datetime.utcnow().isoformat()
+        prediction_record.shap_image = None
+        prediction_record.llm_report_json = None
+        prediction_record.pdf_binary = None
+        prediction_record.report_generated_at = None
 
     db.commit()
 
@@ -217,6 +223,11 @@ def internal_shap_png(body: InternalTargetRequest, db: Session = Depends(get_db)
         raise HTTPException(
             status_code=400,
             detail="Prediction not evaluated yet. Call POST /internal/predict first.",
+        )
+    if prediction_record.decision == "low":
+        raise HTTPException(
+            status_code=400,
+            detail="SHAP image is not available for low risk predictions.",
         )
 
     if not prediction_record.shap_image:
@@ -253,6 +264,11 @@ def internal_shap_data(body: InternalTargetRequest, db: Session = Depends(get_db
         raise HTTPException(
             status_code=400,
             detail="Prediction not evaluated yet. Call POST /internal/predict first.",
+        )
+    if prediction_record.decision == "low":
+        raise HTTPException(
+            status_code=400,
+            detail="SHAP data is not available for low risk predictions.",
         )
 
     if prediction_record.shap_values_json:
@@ -317,6 +333,11 @@ def internal_report_pdf(body: InternalTargetRequest, db: Session = Depends(get_d
         raise HTTPException(
             status_code=400,
             detail="Prediction has not been evaluated yet. Call POST /internal/predict first.",
+        )
+    if prediction_record.decision == "low":
+        raise HTTPException(
+            status_code=400,
+            detail="Report PDF is not available for low risk predictions.",
         )
     if not prediction_record.pdf_binary:
         raise HTTPException(

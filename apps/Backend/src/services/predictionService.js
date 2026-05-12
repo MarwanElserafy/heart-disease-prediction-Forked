@@ -71,11 +71,21 @@ class PredictionService {
 
   static async shapPngForPrediction(predictionId, user) {
     const prediction = await this.assertPredictionOwnedByUser(predictionId, user);
+    if (prediction.decision === "low") {
+      const err = new Error("SHAP image is not available for low risk predictions.");
+      err.statusCode = 400;
+      throw err;
+    }
     return internalShapPng(prediction.lab_test_id);
   }
 
   static async reportPdfForPrediction(predictionId, user) {
     const prediction = await this.assertPredictionOwnedByUser(predictionId, user);
+    if (prediction.decision === "low") {
+      const err = new Error("Report PDF is not available for low risk predictions.");
+      err.statusCode = 400;
+      throw err;
+    }
     return internalReportPdf(prediction.lab_test_id);
   }
 }
