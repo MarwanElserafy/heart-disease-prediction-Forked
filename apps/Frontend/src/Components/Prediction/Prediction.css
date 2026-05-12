@@ -8,11 +8,9 @@ body {
 .prediction-page {
   min-height: 100vh;
 
- 
-
   display: flex;
-  justify-content: center;  /* يوسّط أفقي */
-  align-items: center;      /* يوسّط رأسي (اختياري) */
+  justify-content: center;
+  align-items: center;
 
   padding: 120px 20px 80px;
 }
@@ -34,8 +32,8 @@ body {
 
   background: linear-gradient(90deg, #21444B 0%, #1198B7 100%);
   background-clip: text;
--webkit-background-clip: text;
-color: transparent;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 /* SUBTITLE */
@@ -50,10 +48,91 @@ color: transparent;
     rgba(18,83,94,0.6),
     rgba(17,152,183,0.7)
   );
+
   background-clip: text;
--webkit-background-clip: text;
-color: transparent;
- 
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* ================= UPLOAD SECTION ================= */
+
+.upload-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin: 35px 0;
+  flex-wrap: wrap;
+}
+
+/* hide original input */
+.upload-section input[type="file"] {
+  display: none;
+}
+
+/* CHOOSE FILE = SAME AS START PREDICTION */
+.custom-file-upload {
+  width: 250px;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50px;
+
+  background: linear-gradient(90deg,#1198B7,#0e7f97);
+
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 20px rgba(17,152,183,0.35);
+
+  transition: 0.3s ease;
+}
+
+.custom-file-upload:hover {
+  transform: translateY(-3px);
+}
+
+/* UPLOAD CSV = SAME AS LEARN MORE */
+.upload-btn {
+  width: 250px;
+  height: 50px;
+
+  border: 1px solid #000;
+  border-radius: 50px;
+
+  background: white;
+
+  color: black;
+  font-size: 18px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 20px rgba(17,152,183,0.35);
+
+  transition: 0.3s ease;
+}
+
+.upload-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* FILE NAME */
+.file-name {
+  width: 100%;
+  text-align: center;
+
+  color: #21444B;
+
+  font-size: 14px;
+  font-weight: 500;
 }
 
 /* BUTTONS */
@@ -62,7 +141,6 @@ color: transparent;
   justify-content: center;
   gap: 40px;
   margin: 35px 0;
-  
 }
 
 .btn {
@@ -77,18 +155,18 @@ color: transparent;
   height: 50px;
 }
 
-/* نفس الحجم */
+/* START BUTTON */
 .start {
   background: linear-gradient(90deg,#1198B7,#0e7f97);
   color: white !important;
   box-shadow: 0 8px 20px rgba(17,152,183,0.35);
 }
 
-/* نفس الحجم */
+/* LEARN BUTTON */
 .learn {
   color: black;
   box-shadow: 0 8px 20px rgba(17,152,183,0.35);
-  border-radius: 50px; /* بدل 100% */
+  border-radius: 50px;
 }
 
 .btn:hover {
@@ -108,21 +186,22 @@ color: transparent;
   text-transform: capitalize;
 
   background: linear-gradient(90deg, #21444B 0%, #4EA0B1 54%);
- background-clip: text;
--webkit-background-clip: text;
-color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 .highlight {
-  display: block;          /* ينزل سطر لوحده */
+  display: block;
   margin-top: 10px;
 
   font-weight: 500;
   font-size: 20px;
   line-height: 1.4;
 
-  color: #21444BD9;        /* لون ثابت */
+  color: #21444BD9;
 }
+
 .report-box {
   background: linear-gradient(to right,#5FBECEB2 , #306068);
   border-radius: 40px;
@@ -138,7 +217,43 @@ color: transparent;
   color: white;
 }
 
-.labs-title{
+.report-box span {
+  font-size: 14px;
+  color: white;
+}
+
+/* INFO TEXT */
+.info-text {
+  max-width: 1105px;
+  margin: 50px auto;
+  text-align: center;
+
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 1.2;
+  text-transform: capitalize;
+
+  background: linear-gradient(90deg, #21444B 0%, #4EA0B1 54.33%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* ================= LABS ================= */
+
+.labs-section {
+  margin-top: 70px;
+}
+
+.labs-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.labs-title {
   width: 411px;
   height: 52px;
 
@@ -154,58 +269,18 @@ color: transparent;
   background-clip: text;
   color: transparent;
 
-  margin: 0 auto; /* يوسّطه */
+  margin: 0 auto;
 }
-.labs-sub{
+
+.labs-sub {
   max-width: 416px;
   font-weight: 700;
-  font-size: 50px;
-  line-height: 120%;      /* أنعم شوية للقراءة */
+  font-size: 20px;
+  line-height: 120%;
   text-align: center;
   text-transform: capitalize;
   color: rgba(33, 68, 75, 0.7);
   margin: 12px auto 0;
-}
-.report-box span {
-  font-size: 14px;
-  color: white;
-  margin-top: 50%;
-}
-
-.info-text {
-  max-width: 1105px;
-  margin: 50px auto;
-  text-align: center;
-
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
-  font-size: 34px;
-  line-height: 1.2;
-  letter-spacing: 0;
-  text-transform: capitalize;
-
-  background: linear-gradient(90deg, #21444B 0%, #4EA0B1 54.33%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-}
-/* ================= LABS ================= */
-
-.labs-section {
-  margin-top: 70px;
-}
-
-
-.labs-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.labs-sub {
-  color: #6c8a96;
-  font-size: 14px;
 }
 
 .arrows button {
@@ -224,8 +299,7 @@ color: transparent;
 .labs-wrapper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-  justify-content: center;
+  gap: 35px;
   margin-top: 50px;
 }
 
@@ -233,112 +307,113 @@ color: transparent;
 
 .lab-card {
   width: 100%;
-  max-width: 442px;
-  height: 482px;
-  background: #b9d7df;
-  overflow: hidden;
-  text-decoration: none;
-  color: black;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.18);
+  background: linear-gradient(
+    180deg,
+    #d7eef3 0%,
+    #b9d7df 100%
+  );
+
+  border-radius: 28px;
+
+  padding: 30px 25px;
+
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+
   transition: 0.3s ease;
+
   display: flex;
   flex-direction: column;
+  justify-content: center;
+
+  min-height: 220px;
+  text-decoration: none;
 }
 
 .lab-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.22);
+  box-shadow: 0 20px 40px rgba(17,152,183,0.22);
 }
 
-
-/* ===== IMAGE SECTION ===== */
-
-.lab-image {
-  background: #b9d7df;
-  height: 300px;
-  padding: 15px; /* فراغ بسيط من كل الاتجاهات */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: inset 0 3px 8px rgba(0,0,0,0.05);
-}
-
-.lab-image img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-
-/* ===== CONTENT SECTION ===== */
+/* ===== CONTENT ===== */
 
 .lab-content {
-  padding: 18px 22px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* يخلي العناصر موزعة صح */
+  width: 100%;
 }
 
-/* ===== TITLE + RATING ===== */
+/* ===== TITLE + BADGE ===== */
 
 .lab-title-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+
+  margin-bottom: 22px;
 }
+
 .lab-title-row h4 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  background: linear-gradient(
+    90deg,
+    #21444B 0%,
+    #4EA0B1 100%
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .rating-badge {
-  background: #1eaac0;
+  background: #1198B7;
+
   color: white;
-  padding: 6px 16px;
+
+  padding: 8px 18px;
+
   border-radius: 30px;
-  font-size: 13px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ===== INFO ===== */
+
+.lab-info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lab-info p {
+  margin: 0;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  font-size: 15px;
+  line-height: 1.7;
+
+  color: #21444B;
+
   font-weight: 500;
 }
 
-.lab-info {
-  min-height: 70px;   /* يظبط طول الجزء بتاع العناوين */
+.lab-info svg {
+  color: #1198B7;
+  margin-top: 4px;
+  flex-shrink: 0;
 }
-
-
-/* ===== ADDRESSES ===== */
-
-.lab-info p {
-  font-size: 13px;
-  color: #2b4f57;
-  margin: 6px 0;
-  line-height: 1.5;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-/* ===== RESPONSIVE ===== */
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 1024px) {
+
   .labs-wrapper {
     grid-template-columns: repeat(2, 1fr);
   }
-}
-
-@media (max-width: 600px) {
-  .labs-wrapper {
-    grid-template-columns: 1fr;
-  }
-
-  .lab-card {
-    max-width: 100%;
-    height: auto;
-  }
-}
-@media (max-width: 1024px) {
 
   .prediction-card h1 {
     font-size: 36px;
@@ -367,11 +442,9 @@ color: transparent;
     width: auto;
     height: auto;
   }
+}
 
-  .labs-sub {
-    font-size: 32px;
-  }
-}@media (max-width: 768px) {
+@media (max-width: 768px) {
 
   .prediction-page {
     padding: 60px 15px;
@@ -392,7 +465,12 @@ color: transparent;
     gap: 15px;
   }
 
-  .btn {
+  .upload-section {
+    flex-direction: column;
+  }
+
+  .btn,
+  .custom-file-upload {
     width: 100%;
   }
 
@@ -417,10 +495,20 @@ color: transparent;
   }
 
   .labs-sub {
-    font-size: 20px;
+    font-size: 16px;
   }
 
   .info-text {
     font-size: 20px;
   }
+
+  .labs-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-card {
+  max-width: 100%;
+  min-height: auto;
+  padding: 22px;
+}
 }

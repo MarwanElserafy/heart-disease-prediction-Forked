@@ -120,22 +120,51 @@ nav li {
 }
 /* Result Section */
 .result-section {
-  padding: 40px 20px 20px;
+  padding: 80px 20px 40px;
 }
 
-.result-title {
+.title-result {
+
+  font-size: 48px;
+
   font-weight: 600;
-  color: #21444b;
-  margin-bottom: 5px;
+
+  line-height: 1.3;
+
+  
+
+  margin-bottom: 20px;
+
+  background: linear-gradient(
+    90deg,
+    #21444b 20%,
+    #1198b7 80%
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  color: transparent;
 }
 
 .result-note_ {
-  font-size: 14px;
-  color: #5f7d8a;
-  margin-bottom: 30px;
-  font-weight: 600;
-}
 
+  font-size: 24px;
+
+  font-weight: 600;
+
+  line-height: 1.6;
+
+  color: #5f7d8a;
+
+  margin-bottom: 45px;
+
+  max-width: 900px;
+
+  margin-left: auto;
+  margin-right: auto;
+}
 /* Card */
 .result-card {
   width: 420px;

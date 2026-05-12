@@ -13,6 +13,7 @@ import Login from "./Components/Login/Login";
 import Register from "./Components/Register/Register";
 import Prediction from "./Components/Prediction/Prediction";
 import Learnmore from "./Components/Learnmore/Learnmore";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 import { AuthProvider } from "./Context/AuthContext";
 
@@ -38,20 +39,70 @@ export default function App() {
         {/* PAGE CONTENT */}
         <div className="page-content">
           <Routes>
-            <Route path="/" element={<Navigate to="/home" />} />
 
-            <Route path="/home" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+  <Route path="/" element={<Navigate to="/home" />} />
 
-            <Route path="/the_general" element={<TheGeneralHome />} />
-            <Route path="/have_risk" element={<HaveRisk />} />
-            <Route path="/have_no_risk" element={<HaveNoRisk />} />
+  {/* PUBLIC ROUTES */}
+  <Route path="/home" element={<Home />} />
+  <Route path="/login" element={<Login />} />
+  <Route path="/register" element={<Register />} />
 
-            <Route path="/prediction" element={<Prediction />} />
-            <Route path="/learnmore" element={<Learnmore />} />
-            <Route path="/profile" element={<Profile />} />
-          </Routes>
+  {/* PROTECTED ROUTES */}
+  <Route
+    path="/the_general"
+    element={
+      <ProtectedRoute>
+        <TheGeneralHome />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/have_risk"
+    element={
+      <ProtectedRoute>
+        <HaveRisk />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/have_no_risk"
+    element={
+      <ProtectedRoute>
+        <HaveNoRisk />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/prediction"
+    element={
+      <ProtectedRoute>
+        <Prediction />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/profile"
+    element={
+      <ProtectedRoute>
+        <Profile />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/learnmore"
+    element={
+      <ProtectedRoute>
+        <Learnmore />
+      </ProtectedRoute>
+    }
+  />
+
+</Routes>
         </div>
 
         {/* FOOTER */}

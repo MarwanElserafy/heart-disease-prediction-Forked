@@ -1,71 +1,281 @@
-import React from "react";
+import React, { useState } from "react";
+
+import axios from "axios";
+
 import "../Pages/The_General_Home_Page.css";
 import "../fontawesome-free-7.0.0-web/css/all.min.css";
 import "../Pages/Profile.css";
-import profile from "../Image/prof.png";
-import logo from "../Image/logo.png";
-import { Link } from "react-router-dom";
-export function Home() {
-  return (
-    <div className="profile-page">
-      
 
-      {/* Profile Card */}
+import profile from "../Image/prof.png";
+
+const Home = () => {
+
+  // ================= GET USER =================
+  const savedUser = JSON.parse(
+    localStorage.getItem("user")
+  );
+
+  // ================= STATES =================
+  const [isEditing, setIsEditing] =
+    useState(false);
+
+  const [editData, setEditData] =
+    useState({
+      username:
+        savedUser?.username || "",
+
+      password: "",
+    });
+
+  // ================= HANDLE CHANGE =================
+  const handleChange = (e) => {
+
+    const { name, value } = e.target;
+
+    setEditData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // ================= HANDLE SAVE =================
+  const handleSave = async () => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token");
+
+      const res = await axios.put(
+        `http://localhost:5000/api/users/${savedUser.id}`,
+        {
+          username:
+            editData.username,
+
+          password:
+            editData.password,
+        },
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+          },
+        }
+      );
+
+      // ================= UPDATE LOCAL STORAGE =================
+      const updatedUser = {
+        ...savedUser,
+        username:
+          editData.username,
+      };
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(updatedUser)
+      );
+
+      alert(
+        "Profile Updated Successfully"
+      );
+
+      setIsEditing(false);
+
+    } catch (err) {
+
+      console.log(err);
+
+      alert(
+        err.response?.data?.message ||
+        "Update Failed"
+      );
+    }
+  };
+
+  return (
+
+    <div className="profile-page">
+
+      {/* ================= PROFILE CARD ================= */}
       <div className="profile-container justify-content-center m-auto">
-        <h2 className="title">My Profile</h2>
+
+        <h2 className="title">
+          My Profile
+        </h2>
 
         <div className="card-box">
+
+          {/* ================= USER INFO ================= */}
           <div className="user-info d-flex justify-content-between align-items-center">
+
             <div className="d-flex align-items-center gap-3">
-              <div className="avatar" />
-              <img src={profile} className="prof" />
+
+              <img
+                src={profile}
+                className="prof"
+                alt="profile"
+              />
+
               <div>
-                <h4>George Anwar</h4>
+
+                <h4>
+                  {editData.username ||
+                    "No Username"}
+                </h4>
+
                 <div className="icons">
-                  <span className="heart">❤</span>
-                  <span className="plus">#</span>
+
+                  <span className="heart">
+                    ❤
+                  </span>
+
+                  <span className="plus">
+                    #
+                  </span>
+
                 </div>
+
               </div>
+
             </div>
-            <button className="edit-btn">Edit User Profile</button>
+
+            <button
+              className="edit-btn"
+              onClick={() => {
+
+                if (isEditing) {
+
+                  handleSave();
+
+                } else {
+
+                  setIsEditing(true);
+                }
+              }}
+            >
+
+              {
+                isEditing
+                  ? "Save"
+                  : "Edit User Profile"
+              }
+
+            </button>
+
           </div>
 
+          {/* ================= INFO LIST ================= */}
           <div className="info-list">
+
+            {/* ================= NATIONAL ID ================= */}
             <div className="info-item">
+
               <div>
-                <p>National Id</p>
-                <span>12345678901</span>
+
+                <p>
+                  National Id
+                </p>
+
+                <span>
+                  {savedUser?.national_id ||
+                    "No National ID"}
+                </span>
+
               </div>
-              <button>Edit</button>
+
             </div>
 
+            {/* ================= USERNAME ================= */}
             <div className="info-item">
+
               <div>
-                <p>Username</p>
-                <span>George Anwar</span>
+
+                <p>
+                  Username
+                </p>
+
+                {
+                  isEditing ? (
+
+                    <input
+                      type="text"
+                      name="username"
+                      value={editData.username}
+                      onChange={handleChange}
+                    />
+
+                  ) : (
+
+                    <span>
+                      {editData.username}
+                    </span>
+
+                  )
+                }
+
               </div>
-              <button>Edit</button>
+
             </div>
 
+            {/* ================= PASSWORD ================= */}
             <div className="info-item">
+
               <div>
-                <p>Password</p>
-                <span>************</span>
+
+                <p>
+                  Password
+                </p>
+
+                {
+                  isEditing ? (
+
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Enter New Password"
+                      value={editData.password}
+                      onChange={handleChange}
+                    />
+
+                  ) : (
+
+                    <span>
+                      ************
+                    </span>
+
+                  )
+                }
+
               </div>
-              <button>Edit</button>
+
             </div>
 
+            {/* ================= EMAIL ================= */}
             <div className="info-item">
+
               <div>
-                <p>Email</p>
-                <span>george10@gmail.com</span>
+
+                <p>
+                  Email
+                </p>
+
+                <span>
+                  {savedUser?.email ||
+                    "No Email"}
+                </span>
+
               </div>
-              <button>Edit</button>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
-}
+};
+
 export default Home;
