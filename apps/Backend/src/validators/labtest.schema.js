@@ -97,26 +97,9 @@ const labTestUpdateSchema = z.object({
   }).strict(),
 });
 
-// Prediction Update Schema
-const predictionUpdateSchema = z.object({
-  body: z.object({
-    prediction_result: z.enum(["High Risk", "Low Risk"], {
-      required_error: "Prediction result is required",
-      invalid_type_error: "Prediction result must be 'High Risk' or 'Low Risk'",
-    }),
-
-    prediction_percentage: z.coerce
-      .number({
-        required_error: "Prediction percentage is required",
-        invalid_type_error: "Prediction percentage must be a number",
-      })
-      .min(0, "Prediction percentage must be between 0 and 100")
-      .max(100, "Prediction percentage must be between 0 and 100"),
-  }).strict(),
-});
+// Prediction Update Schema (Removed as it is no longer used)
 
 module.exports = {
   labTestCreateSchema,
   labTestUpdateSchema,
-  predictionUpdateSchema,
 };
