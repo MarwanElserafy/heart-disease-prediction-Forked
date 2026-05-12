@@ -1,135 +1,15 @@
 const prisma = require("../config/prisma");
 const { handlePrismaError } = require("../middlewares/prismaErrors");
-const fs = require("fs/promises");
-const path = require("path");
-const { parse } = require("csv-parse/sync");
+const {
+  LabCsvValidationError,
+  labTestInclude,
+  shapeLabTest,
+  processSingleCsvUpload,
+} = require("../services/labCsvIngestService");
 
-// Helper: flatten features object into top-level Prisma fields
 const flattenFeatures = (body) => {
   const { features, ...rest } = body;
   return { ...rest, ...(features || {}) };
-};
-
-// Helper: nest flat Prisma fields back into features object for response
-const shapeLabTest = (labTest) => {
-  if (!labTest) return null;
-  const {
-    age, sex, chest_pain_type, resting_bp_s, cholesterol,
-    fasting_blood_sugar, resting_ecg, max_heart_rate,
-    exercise_angina, oldpeak, st_slope, ...rest
-  } = labTest;
-  return {
-    ...rest,
-    features: {
-      age, sex, chest_pain_type, resting_bp_s, cholesterol,
-      fasting_blood_sugar, resting_ecg, max_heart_rate,
-      exercise_angina, oldpeak, st_slope,
-    },
-  };
-};
-
-const labTestInclude = { lab: true };
-
-const normalizeLabCode = (labCode) => String(labCode || "").trim();
-
-const isAllowedLabCode = (labCode) => {
-  const v = normalizeLabCode(labCode).toLowerCase();
-  return v.includes("al borg") || v.includes("al mokhtabar");
-};
-
-const parseSingleRowCsv = (csvText) => {
-  const records = parse(csvText, {
-    columns: true,
-    skip_empty_lines: true,
-    trim: true,
-  });
-  if (!records || records.length === 0) {
-    throw new Error("CSV contains no data rows");
-  }
-  return records[0];
-};
-
-const rowToLabTestData = async ({ row, file, enforceNationalId, reqUser }) => {
-  const lab_id = String(row.lab_id || "").trim();
-  const national_id = String(row.national_id || enforceNationalId || "").trim();
-  const lab_code = normalizeLabCode(row.lab_code);
-
-  if (!lab_id || !national_id || !lab_code) {
-    throw new Error("CSV row must include lab_id, national_id, lab_code");
-  }
-  if (!/^\d{14}$/.test(national_id)) {
-    throw new Error("national_id must be exactly 14 digits");
-  }
-
-  if (reqUser?.national_id && enforceNationalId) {
-    if (national_id !== String(reqUser.national_id)) {
-      throw new Error("CSV national_id must match the logged-in user national_id");
-    }
-  }
-
-  if (!isAllowedLabCode(lab_code)) {
-    throw new Error("lab_code must belong to AL Borg Labs or AL Mokhtabar labs only");
-  }
-
-  const lab = await prisma.lab.findUnique({ where: { id: lab_id } });
-  if (!lab) throw new Error("lab_id does not exist");
-  if (String(lab.lab_code).trim() !== lab_code) {
-    throw new Error("lab_code does not match the lab_id in database");
-  }
-
-  const numeric = (k) => (row[k] === undefined || row[k] === null || row[k] === "" ? undefined : Number(row[k]));
-  const intLike = (k) => (row[k] === undefined || row[k] === null || row[k] === "" ? undefined : parseInt(row[k], 10));
-
-  const data = {
-    lab_id,
-    national_id,
-    age: numeric("age"),
-    sex: intLike("sex"),
-    chest_pain_type: intLike("chest_pain_type"),
-    resting_bp_s: numeric("resting_bp_s"),
-    cholesterol: numeric("cholesterol"),
-    fasting_blood_sugar: intLike("fasting_blood_sugar"),
-    resting_ecg: intLike("resting_ecg"),
-    max_heart_rate: numeric("max_heart_rate"),
-    exercise_angina: intLike("exercise_angina"),
-    oldpeak: numeric("oldpeak"),
-    st_slope: intLike("st_slope"),
-  };
-
-  const requiredKeys = [
-    "age",
-    "sex",
-    "chest_pain_type",
-    "resting_bp_s",
-    "cholesterol",
-    "fasting_blood_sugar",
-    "resting_ecg",
-    "max_heart_rate",
-    "exercise_angina",
-    "oldpeak",
-    "st_slope",
-  ];
-  for (const k of requiredKeys) {
-    if (data[k] === undefined || Number.isNaN(data[k])) {
-      throw new Error(`Missing/invalid column: ${k}`);
-    }
-  }
-
-  const labTest = await prisma.labTest.create({
-    data,
-    include: labTestInclude,
-  });
-
-  return {
-    id: labTest.id,
-    national_id,
-    lab_id,
-    lab_code,
-    file: {
-      originalname: file?.originalname,
-    },
-    data: shapeLabTest(labTest),
-  };
 };
 
 const createLabTest = async (req, res, next) => {
@@ -146,65 +26,6 @@ const createLabTest = async (req, res, next) => {
   }
 };
 
-// Upload 5 CSV files (form-data key: files) and create 5 LabTest rows (1 per file).
-// Each CSV must contain ONE data row with at least:
-// lab_id, national_id, lab_code, age, sex, chest_pain_type, resting_bp_s, cholesterol,
-// fasting_blood_sugar, resting_ecg, max_heart_rate, exercise_angina, oldpeak, st_slope
-const uploadLabTestsCsvs = async (req, res, next) => {
-  try {
-    const files = Array.isArray(req.files) ? req.files : [];
-    if (files.length < 1 || files.length > 5) {
-      return res.status(400).json({
-        success: false,
-        message: "Upload between 1 and 5 CSV files (form-data key: files)",
-      });
-    }
-
-    const created = [];
-    const failures = [];
-    const seenNationalIds = new Set();
-
-    for (const file of files) {
-      try {
-        const csvText = file.buffer.toString("utf8");
-        const row = parseSingleRowCsv(csvText);
-        const national_id = String(row.national_id || "").trim();
-        if (seenNationalIds.has(national_id)) {
-          throw new Error("Duplicate national_id across uploaded CSVs (each user must have 1 CSV)");
-        }
-        const createdOne = await rowToLabTestData({ row, file, enforceNationalId: null, reqUser: null });
-        seenNationalIds.add(createdOne.national_id);
-        created.push(createdOne);
-      } catch (e) {
-        failures.push({
-          file: file?.originalname,
-          error: e?.message || String(e),
-        });
-      }
-    }
-
-    if (created.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No lab tests created from uploaded CSV files",
-        failures,
-      });
-    }
-
-    res.status(201).json({
-      success: true,
-      message: "Lab test CSV files processed",
-      createdCount: created.length,
-      failuresCount: failures.length,
-      created,
-      failures,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-// Upload ONE CSV for the LOGGED-IN user only (form-data key: file).
 const uploadLabTestCsvForUser = async (req, res, next) => {
   try {
     if (!req.user) {
@@ -222,13 +43,7 @@ const uploadLabTestCsvForUser = async (req, res, next) => {
       });
     }
 
-    const csvText = file.buffer.toString("utf8");
-    const row = parseSingleRowCsv(csvText);
-
-    // Must match logged-in user national_id to prevent mixing users.
-    const createdOne = await rowToLabTestData({
-      row,
-      file,
+    const createdOne = await processSingleCsvUpload(file, {
       enforceNationalId: req.user.national_id,
       reqUser: req.user,
     });
@@ -239,6 +54,13 @@ const uploadLabTestCsvForUser = async (req, res, next) => {
       created: createdOne,
     });
   } catch (err) {
+    if (err instanceof LabCsvValidationError) {
+      return res.status(err.statusCode).json({
+        success: false,
+        message: err.message,
+      });
+    }
+    if (handlePrismaError(err, res)) return;
     next(err);
   }
 };
@@ -252,7 +74,8 @@ const getLabTests = async (req, res, next) => {
     const [total, labTests] = await Promise.all([
       prisma.labTest.count(),
       prisma.labTest.findMany({
-        skip, take: limit,
+        skip,
+        take: limit,
         orderBy: { createdAt: "desc" },
         include: labTestInclude,
       }),
@@ -308,7 +131,6 @@ const getLatestLabTestByNationalId = async (req, res, next) => {
   }
 };
 
-// Helps frontend decide: if no lab tests, recommend showing Labs page.
 const getLabTestStatusByNationalId = async (req, res, next) => {
   try {
     const national_id = req.params.national_id;
@@ -327,7 +149,6 @@ const getLabTestStatusByNationalId = async (req, res, next) => {
   }
 };
 
-// Same as status-by-national-id but uses the logged-in user (no national_id in URL).
 const getMyLabTestStatus = async (req, res, next) => {
   try {
     if (!req.user?.national_id) {
@@ -389,7 +210,6 @@ const deleteLabTest = async (req, res, next) => {
 
 module.exports = {
   createLabTest,
-  uploadLabTestsCsvs,
   uploadLabTestCsvForUser,
   getLabTests,
   getLabTestById,

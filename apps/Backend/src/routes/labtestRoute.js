@@ -2,10 +2,9 @@ const express = require("express");
 const { validate } = require("../middlewares/validate");
 const { labTestCreateSchema, labTestUpdateSchema } = require("../validators/labtest.schema");
 const { authenticate } = require("../middlewares/auth");
-const { uploadLabTestsCsvs: uploadMiddleware, uploadLabTestCsv: uploadSingleMiddleware } = require("../middlewares/uploadLabTestsCsvs");
+const { uploadLabTestCsv: uploadSingleMiddleware } = require("../middlewares/uploadLabTestsCsvs");
 const {
   createLabTest,
-  uploadLabTestsCsvs,
   uploadLabTestCsvForUser,
   getLabTests,
   getLabTestById,
@@ -21,7 +20,6 @@ const {
 const router = express.Router();
 
 router.post("/", authenticate, validate(labTestCreateSchema), createLabTest);
-router.post("/upload-csvs", authenticate, uploadMiddleware, uploadLabTestsCsvs);
 router.post("/upload-csv", authenticate, uploadSingleMiddleware, uploadLabTestCsvForUser);
 router.get("/", getLabTests);
 router.get("/me/status", authenticate, getMyLabTestStatus);
