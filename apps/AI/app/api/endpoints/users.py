@@ -1,41 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from core.database import get_db
-from db.models import PatientPrediction
-from schemas.patient_schema import ClientPredict
+from db.database import get_db
+from db.models import LabTest, Prediction
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.post("")
-def add_user(client: ClientPredict, db: Session = Depends(get_db)):
-    db_patient = PatientPrediction(
-        age=client.age,
-        sex=client.sex.value,
-        chest_pain_type=client.chest_pain_type.value,
-        resting_bp_s=client.resting_bp_s,
-        cholesterol=client.cholesterol,
-        fasting_blood_sugar=client.fasting_blood_sugar.value,
-        resting_ecg=client.resting_ecg.value,
-        max_heart_rate=client.max_heart_rate,
-        exercise_angina=client.exercise_angina.value,
-        oldpeak=client.oldpeak,
-        ST_slope=client.ST_slope.value
-    )
-    db.add(db_patient)
-    db.commit()
-    db.refresh(db_patient)
-
-    return {
-        "message": "User added successfully",
-        "id": db_patient.id
-    }
+def add_user():
+    raise HTTPException(status_code=400, detail="Use Node.js API to create lab tests.")
 
 @router.get("/{id}")
-def get_user(id: int, db: Session = Depends(get_db)):
-    patient = db.query(PatientPrediction).filter(PatientPrediction.id == id).first()
+def get_user(id: str, db: Session = Depends(get_db)):
+    patient = db.query(LabTest).filter(LabTest.id == id).first()
     if not patient:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="LabTest not found")
 
+    prediction_record = db.query(Prediction).filter(Prediction.lab_test_id == id).first()
+    
     return {
         "id": patient.id,
         "data": {
@@ -49,7 +30,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
             "max_heart_rate": patient.max_heart_rate,
             "exercise_angina": patient.exercise_angina,
             "oldpeak": patient.oldpeak,
-            "ST_slope": patient.ST_slope,
+            "ST_slope": patient.st_slope,
         },
-        "prediction": patient.prediction
+        "prediction": prediction_record.prediction_result if prediction_record else None
     }

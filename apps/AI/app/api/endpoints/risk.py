@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
-from core.database import get_db
+from db.database import get_db
 from db.models import PatientPrediction
 from services.ml_service import ml_service
 import pandas as pd

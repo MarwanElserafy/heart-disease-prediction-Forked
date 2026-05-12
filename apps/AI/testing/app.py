@@ -1,7 +1,7 @@
 """
 Streamlit Web App for Heart Disease Prediction
 ----------------------------------------------
-Uses a pre-trained model saved to disk (e.g., models/best_model.pkl).
+Uses a pre-trained model saved to disk (e.g., assets/best_model.pkl).
 
 Features:
 - Upload CSV, validate columns, reorder to training schema
@@ -200,10 +200,10 @@ prediction_threshold_decimal = prediction_threshold / 100.0
 
 # Try multiple possible model paths
 possible_paths = [
-    "AI/models/best_model.pkl",
-    "models/best_model.pkl",
-    "./AI/models/best_model.pkl",
-    "./models/best_model.pkl"
+    "AI/assets/best_model.pkl",
+    "assets/best_model.pkl",
+    "./AI/assets/best_model.pkl",
+    "./assets/best_model.pkl"
 ]
 
 model_path = None

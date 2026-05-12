@@ -14,10 +14,13 @@ if not DATABASE_URL:
 engine = create_engine(DATABASE_URL)
 
 MIGRATIONS = [
-    ("llm_report_json", "ALTER TABLE patients_predictions ADD COLUMN IF NOT EXISTS llm_report_json JSON;"),
-    ("probability",     "ALTER TABLE patients_predictions ADD COLUMN IF NOT EXISTS probability FLOAT;"),
-    ("risk_level",      "ALTER TABLE patients_predictions ADD COLUMN IF NOT EXISTS risk_level VARCHAR(50);"),
-    ("decision",        "ALTER TABLE patients_predictions ADD COLUMN IF NOT EXISTS decision VARCHAR(10);"),
+    ("llm_report_json", "ALTER TABLE predictions ADD COLUMN IF NOT EXISTS llm_report_json JSON;"),
+    ("probability",     "ALTER TABLE predictions ADD COLUMN IF NOT EXISTS probability FLOAT;"),
+    ("risk_level",      "ALTER TABLE predictions ADD COLUMN IF NOT EXISTS risk_level VARCHAR(50);"),
+    ("decision",        "ALTER TABLE predictions ADD COLUMN IF NOT EXISTS decision VARCHAR(10);"),
+    ("shap_values_json","ALTER TABLE predictions ADD COLUMN IF NOT EXISTS shap_values_json JSON;"),
+    ("pdf_binary",      "ALTER TABLE predictions ADD COLUMN IF NOT EXISTS pdf_binary BYTEA;"),
+    ("report_generated_at","ALTER TABLE predictions ADD COLUMN IF NOT EXISTS report_generated_at VARCHAR(50);"),
 ]
 
 try:

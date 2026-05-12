@@ -1,0 +1,236 @@
+{
+  "info": {
+    "name": "Heart Disease Prediction - Unified API (Simple)",
+    "_postman_id": "hd-prediction-api-2026-simple",
+    "description": "Frontend-ready minimal collection.\n\nSecurity: ML/SHAP/report are NOT exposed on FastAPI to browsers. Always call the Node backend; it talks to the internal AI service with X-INTERNAL-API-KEY.\n\nFlow:\n1) Auth → Register (any user)\n2) Auth → Login (saves token; clears labtest_id + prediction_id)\n3) Lab Tests → Upload CSV (current user) (saves labtest_id)\n4) Lab Tests → Get My Status (me)\n5) Predictions → Start Prediction (JWT) — uses latest lab test for your national_id; saves prediction_id\n6) Predictions → Get SHAP PNG / Get PDF Report (JWT, high-risk flow) — use prediction_id from step 5\n\nRules:\n- If Get My Status says hasLabTests=false ⇒ show Labs page\n- If prediction decision=low ⇒ show only decision + probability\n- If prediction decision=high ⇒ show hospitals + SHAP + report (when show_shap/show_report are true)\n\nBase URL: http://localhost:5000 (Node API gateway only).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "labtest_id", "value": "", "type": "string" },
+    { "key": "prediction_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register (any user)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"national_id\": \"\",\n  \"username\": \"\",\n  \"email\": \"\",\n  \"password\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/auth/register", "host": ["{{base_url}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login (any user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (pm.response.code === 200 && json.token) {",
+                  "  pm.environment.set('token', json.token);",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "  pm.environment.set('labtest_id', '');",
+                  "  pm.collectionVariables.set('labtest_id', '');",
+                  "  pm.environment.set('prediction_id', '');",
+                  "  pm.collectionVariables.set('prediction_id', '');",
+                  "}",
+                  "console.log('Login response:', json);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"\",\n  \"password\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lab Tests",
+      "item": [
+        {
+          "name": "Upload CSV (current user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (pm.response.code === 201 && json.created && json.created.id) {",
+                  "  pm.environment.set('labtest_id', json.created.id);",
+                  "  pm.collectionVariables.set('labtest_id', json.created.id);",
+                  "  console.log('✅ labtest_id saved:', json.created.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": [] }]
+            },
+            "url": { "raw": "{{base_url}}/api/labtests/upload-csv", "host": ["{{base_url}}"], "path": ["api", "labtests", "upload-csv"] }
+          }
+        },
+        {
+          "name": "Get My Status (me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/api/labtests/me/status", "host": ["{{base_url}}"], "path": ["api", "labtests", "me", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Labs (read-only)",
+      "item": [
+        {
+          "name": "Get All Labs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/labs?page=1&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "labs"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "50" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Lab by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/api/labs/{{lab_id}}", "host": ["{{base_url}}"], "path": ["api", "labs", "{{lab_id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hospitals (read-only)",
+      "item": [
+        {
+          "name": "Get All Hospitals",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/hospitals?page=1&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hospitals"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "50" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Hospitals by Area",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/api/hospitals/area/{{area}}", "host": ["{{base_url}}"], "path": ["api", "hospitals", "area", "{{area}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Predictions (Backend gateway)",
+      "description": "JWT required. Node calls internal FastAPI — do not hit :8000 /predict or /shap from the frontend.",
+      "item": [
+        {
+          "name": "Start Prediction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (pm.response.code === 201 && json.success && json.data && json.data.prediction_id) {",
+                  "  pm.environment.set('prediction_id', json.data.prediction_id);",
+                  "  pm.collectionVariables.set('prediction_id', json.data.prediction_id);",
+                  "  console.log('✅ prediction_id saved:', json.data.prediction_id);",
+                  "}",
+                  "console.log('Start prediction:', json);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/predictions/start",
+              "host": ["{{base_url}}"],
+              "path": ["api", "predictions", "start"]
+            },
+            "description": "Uses the latest LabTest row for the logged-in user's national_id. Response data includes prediction_id for SHAP/report."
+          }
+        },
+        {
+          "name": "Get SHAP (PNG)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/predictions/{{prediction_id}}/shap",
+              "host": ["{{base_url}}"],
+              "path": ["api", "predictions", "{{prediction_id}}", "shap"]
+            },
+            "description": "Returns image/png. prediction_id from Start Prediction (not labtest_id)."
+          }
+        },
+        {
+          "name": "Get Medical Report (PDF)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/predictions/{{prediction_id}}/report",
+              "host": ["{{base_url}}"],
+              "path": ["api", "predictions", "{{prediction_id}}", "report"]
+            },
+            "description": "Returns application/pdf. Ownership enforced — only your prediction."
+          }
+        }
+      ]
+    }
+  ]
+}
