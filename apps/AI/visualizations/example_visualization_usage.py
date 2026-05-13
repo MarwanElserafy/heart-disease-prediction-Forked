@@ -62,7 +62,7 @@ def main():
     best_name, best_metrics = model.save_best_model(
         X_test=X_test,
         y_test=y_test,
-        save_path="models/best_model.pkl",
+        save_path="assets/best_model.pkl",
         metric="accuracy"
     )
 
