@@ -1,14 +1,30 @@
-Project/
+# Node
 node_modules/
-/images
+
+# Environment files
 .env
+.env.*
 apps/AI/.env
+apps/Backend/.env
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Virtual environments
 .venv/
 venv/
 ENV/
+
+# Editors
 .vscode/
 .idea/
+
+# Images / uploads
+/images
+
+# OS files
+.DS_Store
+Thumbs.db
