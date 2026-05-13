@@ -17,6 +17,27 @@ class MLService:
             "exercise angina", "oldpeak", "ST slope"
         ]
 
+    def _normalize_shap_dict(self, raw):
+        """Coerce SHAP payload to float values so charts / lru_cache stay hashable and matplotlib-safe."""
+        default = {col: 0.1 for col in self.required_cols}
+        if not isinstance(raw, dict):
+            return default.copy()
+        out = {}
+        for k, v in raw.items():
+            key = str(k)
+            try:
+                if isinstance(v, (list, tuple)):
+                    v = float(v[0]) if len(v) else 0.0
+                else:
+                    v = float(v)
+            except (TypeError, ValueError, IndexError):
+                v = 0.0
+            out[key] = v
+        for col in self.required_cols:
+            if col not in out:
+                out[col] = 0.1
+        return out
+
     def _prepare_payload(self, data: list):
         return {
             "age": float(data[0]),
@@ -78,7 +99,9 @@ class MLService:
                 # Need fresh prediction from API
                 result = self._call_api(data)
                 probability_pct = float(result.get("probability", 0.0))
-                shap_data       = result.get("shap_values", shap_data)
+                shap_data = self._normalize_shap_dict(
+                    result.get("shap_values", shap_data)
+                )
             else:
                 # Use existing probability (skip API call)
                 probability_pct = probability
@@ -87,6 +110,7 @@ class MLService:
         except Exception as e:
             print("Error in assess_full_prediction:", e)
             assessment = assess_risk(0.0)   # safe fallback
+        shap_data = self._normalize_shap_dict(shap_data)
         return assessment, shap_data
 
     # ── SHAP image generator ──────────────────────────────────────────

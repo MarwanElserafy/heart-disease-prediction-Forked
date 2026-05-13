@@ -153,17 +153,21 @@ def create_prediction(id: str, db: Session = Depends(get_db)):
             "id": patient.id,
         }
 
-        pdf_bytes_io = generate_medical_report_pdf(
-            patient_data=patient_data,
-            risk_score=risk_score,
-            llm_report=llm_report,
-            images_base64=images_base64,
-            lab_data=lab_data,
-            lab_test_data=lab_test_data
-        )
-
-        prediction_record.pdf_binary = pdf_bytes_io.getvalue()
-        prediction_record.report_generated_at = datetime.utcnow().isoformat()
+        try:
+            pdf_bytes_io = generate_medical_report_pdf(
+                patient_data=patient_data,
+                risk_score=risk_score,
+                llm_report=llm_report,
+                images_base64=images_base64,
+                lab_data=lab_data,
+                lab_test_data=lab_test_data
+            )
+            prediction_record.pdf_binary = pdf_bytes_io.getvalue()
+            prediction_record.report_generated_at = datetime.utcnow().isoformat()
+        except Exception as e:
+            print(f"Warning: PDF report generation failed (prediction still saved): {e}")
+            prediction_record.pdf_binary = None
+            prediction_record.report_generated_at = None
     else:
         prediction_record.shap_image = None
         prediction_record.llm_report_json = None
