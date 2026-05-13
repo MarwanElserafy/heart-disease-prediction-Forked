@@ -213,14 +213,16 @@ const Prediction = () => {
 
 
           navigate(
-            "/have-no-risk"
+            "/have_no_risk"
           );
+
 
         } else {
 
           navigate(
-            "/have-risk"
+            "/have_risk"
           );
+
         }
 
       } catch (err) {

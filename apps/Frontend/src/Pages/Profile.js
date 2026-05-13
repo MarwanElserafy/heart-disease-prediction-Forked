@@ -46,7 +46,7 @@ const Home = () => {
       const token =
         localStorage.getItem("token");
 
-      const res = await axios.put(
+      await axios.put(
         `http://localhost:5000/api/users/${savedUser.id}`,
         {
           username:

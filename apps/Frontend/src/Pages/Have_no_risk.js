@@ -51,7 +51,8 @@ function Home() {
       parsedPrediction?.probability >= 70
     ) {
 
-      navigate("/have-risk");
+      navigate("/have_risk");
+
     }
 
   }, [navigate]);

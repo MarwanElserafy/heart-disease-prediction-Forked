@@ -1,13 +1,11 @@
 import React from "react";
 import "../Pages/The_General_Home_Page.css";
 import "../fontawesome-free-7.0.0-web/css/all.min.css";
-import profile from "../Image/profile.png";
-import logo from "../Image/logo.png";
 import nabd from "../Image/nabd.png";
 import heart_icons from "../Image/heart_icons.png";
 import Box from "../Image/Box.png";
 import { Link } from "react-router-dom";
-import Navbar from "../Components/Navbar/Navbar";
+
 function Home() {
   return (
     <div className="home-page">
@@ -39,7 +37,8 @@ function Home() {
           <div className="col-md-3">
             <div className="feature-card">
               <div className="icon">
-                <img src={nabd} className="image_iconn" />
+                <img src={nabd} className="image_iconn" alt="accurate analysis icon" />
+
               </div>
               <h5 className="Title_card">Accurate Analysis</h5>
               <p className="cap_Card">
@@ -53,7 +52,8 @@ function Home() {
           <div className="col-md-3">
             <div className="feature-card">
               <div className="icon">
-                <img src={heart_icons} className="image_iconn" />
+                <img src={heart_icons} className="image_iconn" alt="health insights icon" />
+
               </div>
               <h5 className="Title_card">Health Insights</h5>
               <p className="cap_Card">Detailed Risk Factor Analysis</p>{" "}
@@ -67,7 +67,8 @@ function Home() {
           <div className="col-md-3">
             <div className="feature-card">
               <div className="icon">
-                <img src={Box} className="image_iconn" />
+                <img src={Box} className="image_iconn" alt="early detection icon" />
+
               </div>
               <h5 className="Title_card">Early Detection</h5>
               <p className="cap_Card">

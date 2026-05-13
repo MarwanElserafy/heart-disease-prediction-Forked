@@ -60,7 +60,8 @@ function Home() {
       parsedPrediction?.probability < 70
     ) {
 
-      navigate("/have-no-risk");
+      navigate("/have_no_risk");
+
 
       return;
     }
