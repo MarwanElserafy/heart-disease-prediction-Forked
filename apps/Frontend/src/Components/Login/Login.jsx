@@ -4,7 +4,7 @@ import "./Login.css";
 import heartImg from "../../assets/heartLog.png";
 import logo from "../../assets/Logo.png";
 
-import { FaEnvelope, FaLock } from "react-icons/fa";
+import { FaUser, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 
 import axios from "axios";
@@ -12,7 +12,7 @@ import axios from "axios";
 const Login = () => {
 
   const [form, setForm] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
@@ -27,18 +27,16 @@ const Login = () => {
 
     let error = "";
 
-    // EMAIL
-    if (name === "email") {
+    // USERNAME
+    if (name === "username") {
 
       if (!value.trim()) {
 
-        error = "Email is required";
+        error = "Username is required";
 
-      } else if (
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-      ) {
+      } else if (value.length < 3) {
 
-        error = "Invalid email format";
+        error = "Username must be at least 3 characters";
       }
     }
 
@@ -93,9 +91,9 @@ const Login = () => {
   // ================= LOGIN =================
   const handleLogin = async () => {
 
-    const emailError = validate(
-      "email",
-      form.email
+    const usernameError = validate(
+      "username",
+      form.username
     );
 
     const passwordError = validate(
@@ -103,10 +101,10 @@ const Login = () => {
       form.password
     );
 
-    if (emailError || passwordError) {
+    if (usernameError || passwordError) {
 
       setErrors({
-        email: emailError,
+        username: usernameError,
         password: passwordError,
       });
 
@@ -120,7 +118,7 @@ const Login = () => {
       const res = await axios.post(
         "http://localhost:5000/api/auth/login",
         {
-          email: form.email,
+          username: form.username,
           password: form.password,
         }
       );
@@ -164,7 +162,7 @@ const Login = () => {
       );
 
       const backendError =
-        "Invalid email or password";
+        "Invalid username or password";
 
       setErrors({
         password: backendError,
@@ -191,24 +189,24 @@ const Login = () => {
               Login Page
             </h2>
 
-            {/* ================= EMAIL ================= */}
+            {/* ================= USERNAME ================= */}
             <div className="input-group">
 
               <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={form.email}
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={form.username}
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
 
-              <FaEnvelope className="input-icon" />
+              <FaUser className="input-icon" />
 
-              {errors.email && (
+              {errors.username && (
 
                 <span className="error">
-                  {errors.email}
+                  {errors.username}
                 </span>
 
               )}
