@@ -407,6 +407,19 @@ body {
   margin-top: 4px;
   flex-shrink: 0;
 }
+
+.lab-card {
+  text-decoration: none;
+}
+
+.lab-card h4 {
+  text-decoration: none;
+}
+
+.lab-card:hover {
+  text-decoration: none;
+}
+
 /* ================= RESPONSIVE ================= */
 
 @media (max-width: 1024px) {

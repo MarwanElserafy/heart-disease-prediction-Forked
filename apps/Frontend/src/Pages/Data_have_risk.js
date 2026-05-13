@@ -19,6 +19,9 @@ function Home() {
   const [hospitals, setHospitals] =
     useState([]);
 
+  const [shapImage, setShapImage] =
+    useState(null);
+
   const navigate = useNavigate();
 
   // ================= GET DATA =================
@@ -27,6 +30,7 @@ function Home() {
     const token =
       localStorage.getItem("token");
 
+    // ================= PROTECT PAGE =================
     if (!token) {
 
       navigate("/login");
@@ -38,18 +42,73 @@ function Home() {
     const savedPrediction =
       localStorage.getItem("prediction");
 
-    if (savedPrediction) {
+    // ================= NO PREDICTION =================
+    if (!savedPrediction) {
 
-      const parsedPrediction =
-        JSON.parse(savedPrediction);
+      navigate("/prediction");
 
-      setPrediction(parsedPrediction);
+      return;
+    }
+
+    const parsedPrediction =
+      JSON.parse(savedPrediction);
+
+    setPrediction(parsedPrediction);
+
+    // ================= REDIRECT IF LOW RISK =================
+    if (
+      parsedPrediction?.probability < 70
+    ) {
+
+      navigate("/have-no-risk");
+
+      return;
+    }
+
+    // ================= GET SHAP IMAGE =================
+    if (parsedPrediction.show_shap) {
+
+      fetchShapImage(
+        parsedPrediction.prediction_id
+      );
     }
 
     // ================= GET HOSPITALS =================
     fetchHospitals();
 
   }, [navigate]);
+
+  // ================= FETCH SHAP IMAGE =================
+  const fetchShapImage = async (
+    predictionId
+  ) => {
+
+    try {
+
+      const token =
+        localStorage.getItem("token");
+
+      const res = await axios.get(
+        `http://localhost:5000/api/predictions/${predictionId}/shap`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: "blob",
+        }
+      );
+
+      const imageUrl =
+        URL.createObjectURL(res.data);
+
+      setShapImage(imageUrl);
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+  };
 
   // ================= GET NEAR HOSPITALS =================
   const fetchHospitals = async () => {
@@ -66,24 +125,9 @@ function Home() {
           const lon =
             position.coords.longitude;
 
-          console.log(
-            "LAT => ",
-            lat
-          );
-
-          console.log(
-            "LON => ",
-            lon
-          );
-
           // ================= GET USER CITY =================
           const geoRes = await axios.get(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-          );
-
-          console.log(
-            "LOCATION => ",
-            geoRes.data
           );
 
           let city =
@@ -100,29 +144,22 @@ function Home() {
             city.includes("الإسكندرية")
           ) {
 
-            city = "Alexandria";
+            city = "Alexandria , Egypt";
 
           } else {
 
-            city = "Cairo";
+            city = "Cairo , Egypt";
           }
 
-          console.log(
-            "CITY => ",
-            city
-          );
-
           // ================= GET HOSPITALS BY AREA =================
-          const res = await axios.get(
-            `http://localhost:5000/api/hospitals/area/${city}`
+          const hospitalsRes = await axios.get(
+            `http://localhost:5000/api/hospitals/area/${encodeURIComponent(city)}`
           );
 
-          console.log(
-            "NEAR HOSPITALS => ",
-            res.data
+          setHospitals(
+            hospitalsRes.data.data
           );
 
-          setHospitals(res.data.data);
         },
 
         (error) => {
@@ -132,12 +169,14 @@ function Home() {
           alert(
             "Please Allow Location Access"
           );
+
         }
       );
 
     } catch (err) {
 
       console.log(err);
+
     }
   };
 
@@ -278,109 +317,139 @@ function Home() {
 
           <p className="result-status">
 
-            {prediction?.decision ||
-              "You Have A Problem"}
+            {prediction?.decision_label ||
+              "Heart Disease Risk"}
 
           </p>
 
         </div>
 
+        {/* ================= SHAP IMAGE ================= */}
+        {prediction?.show_shap &&
+          shapImage && (
+
+            <div className="shap-container">
+
+              <h3 className="medical-report-title">
+
+                AI Explanation (SHAP)
+
+              </h3>
+
+              <img
+                src={shapImage}
+                alt="SHAP Explanation"
+                className="shap-image"
+              />
+
+            </div>
+
+          )}
+
         {/* REPORT */}
-        <div className="medical-report-container">
+        {prediction?.show_report && (
 
-          <h3 className="medical-report-title">
+          <div className="medical-report-container">
 
-            Your medical report:
+            <h3 className="medical-report-title">
 
-          </h3>
+              Your Medical Report:
 
-          <button
-            onClick={handleDownloadReport}
-            className="download-report-btn"
-          >
+            </h3>
 
-            <FaDownload className="download-icon" />
+            <button
+              onClick={handleDownloadReport}
+              className="download-report-btn"
+            >
 
-            Download Report
+              <FaDownload className="download-icon" />
 
-          </button>
+              Download Report
 
-        </div>
+            </button>
+
+          </div>
+
+        )}
 
       </section>
 
       {/* HOSPITALS */}
-      <section className="hospitals-section">
+      {prediction?.show_hospitals && (
 
-        <h3 className="cap-effect">
+        <section className="hospitals-section">
 
-          You should go to one of these hospitals    
-           that specialize in heart diseases.  
-        </h3>
+          <h3 className="cap-effect">
 
-        <div className="hospitals-container">
+            You should go to one of these hospitals
+            that specialize in heart disease.
 
-          {hospitals.length > 0 ? (
+          </h3>
 
-            hospitals.map((hospital) => {
+          <div className="hospitals-container">
 
-              // ================= GET COORDS =================
-              const coords =
-                hospital.google_maps_link
-                  ?.split("q=")[1];
+            {hospitals.length > 0 ? (
 
-              return (
+              hospitals.map((hospital) => {
 
-                <a
-                  key={hospital.id}
-                  href={hospital.google_maps_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hospital-card"
-                >
+                return (
 
-                  <p className="hospital-name">
+                  <a
+                    key={hospital.id}
+                    href={hospital.google_maps_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hospital-card"
+                  >
 
-                    {hospital.name}
+                    {/* HOSPITAL NAME */}
+                    <p className="hospital-name">
 
-                  </p>
+                      {hospital.name}
 
-                  <div className="location">
+                    </p>
 
-                    <FaMapMarkerAlt className="location_icon" />
+                    {/* LOCATION */}
+                    <div className="location">
 
-                    <span className="location_text">
+                      <FaMapMarkerAlt className="location_icon" />
 
-                      {hospital.area}
+                      <span className="location_name">
 
-                    </span>
+                        {hospital.area}
 
-                  </div>
+                      </span>
 
-                  {/* MAP */}
-                  <iframe
-                    className="hospital-map"
-                    src={`https://maps.google.com/maps?q=${coords}&z=15&output=embed`}
-                    loading="lazy"
-                    title={hospital.name}
-                  ></iframe>
+                    </div>
 
-                </a>
-              );
-            })
+                    {/* GOOGLE MAP */}
+                    <iframe
+                      title={hospital.name}
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                        hospital.name + " " + hospital.area
+                      )}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                      className="hospital-map"
+                      loading="lazy"
+                    ></iframe>
 
-          ) : (
+                  </a>
+                );
+              })
 
-            <h3 className="text-center mt-5">
+            ) : (
 
-              No Nearby Hospitals Found
+              <h3 className="text-center mt-5">
 
-            </h3>
-          )}
+                No Nearby Hospitals Found
 
-        </div>
+              </h3>
+            )}
 
-      </section>
+          </div>
+
+        </section>
+
+      )}
 
     </div>
   );

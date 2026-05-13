@@ -1,36 +1,45 @@
 import React, { useState, useEffect } from "react";
+
 import axios from "axios";
 
 import "./Prediction.css";
 
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
 
-import { BsGeoAltFill } from "react-icons/bs";
-import { FaFileCsv } from "react-icons/fa";
+import {
+  BsGeoAltFill,
+} from "react-icons/bs";
 
 const Prediction = () => {
 
   // ================= STATE =================
-  const [result, setResult] = useState(null);
+  const [result, setResult] =
+    useState(null);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] =
+    useState(false);
 
-  const [csvFile, setCsvFile] = useState(null);
+  const [labs, setLabs] =
+    useState([]);
 
-  const [labs, setLabs] = useState([]);
+  const [hasLabTests, setHasLabTests] =
+    useState(false);
 
-  // ================= USER LOCATION =================
   const [userLocation, setUserLocation] =
     useState(null);
 
   const navigate = useNavigate();
 
-  // ================= GET LABS =================
+  // ================= GET LABS + STATUS + LOCATION =================
   useEffect(() => {
 
     fetchLabs();
 
-    // ================= GET USER LOCATION =================
+    checkLabStatus();
+
     navigator.geolocation.getCurrentPosition(
 
       (position) => {
@@ -66,127 +75,174 @@ const Prediction = () => {
         res.data
       );
 
-      setLabs(res.data.data);
+      setLabs(
+        res.data.data
+      );
 
     } catch (err) {
 
       console.log(err);
+
     }
   };
 
-  // ================= UPLOAD CSV =================
-  const handleUploadCSV = async () => {
-
-    if (!csvFile) {
-
-      alert("Please choose CSV file");
-
-      return;
-    }
+  // ================= CHECK LAB TEST STATUS =================
+  const checkLabStatus = async () => {
 
     try {
 
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token");
 
-      const formData = new FormData();
+      if (!token) return;
 
-      formData.append("file", csvFile);
+      const res = await axios.get(
 
-      const res = await axios.post(
-        "http://localhost:5000/api/labtests/upload-csv",
-        formData,
+        "http://localhost:5000/api/labtests/me/status",
+
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            Authorization:
+              `Bearer ${token}`,
           },
         }
+
       );
 
       console.log(
-        "CSV Uploaded => ",
+        "LAB STATUS => ",
         res.data
       );
 
-      alert("CSV Uploaded Successfully");
+      setHasLabTests(
+        res.data.data.hasLabTests
+      );
 
     } catch (err) {
 
-      console.log(
-        err.response?.data || err
-      );
+      console.log(err);
 
-      alert(
-        err.response?.data?.message ||
-        "CSV Upload Failed"
-      );
     }
   };
 
   // ================= START PREDICTION =================
-  const handleStartPrediction = async () => {
+  const handleStartPrediction =
+    async () => {
 
-    setLoading(true);
+      try {
 
-    try {
+        setLoading(true);
 
-      const token = localStorage.getItem("token");
+        const token =
+          localStorage.getItem("token");
 
-      const res = await axios.post(
-        "http://localhost:5000/api/predictions/start",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        // ================= CHECK LOGIN =================
+        if (!token) {
+
+          alert(
+            "Please Login First"
+          );
+
+          setLoading(false);
+
+          return;
         }
-      );
 
-      console.log(
-        "FULL RESPONSE => ",
-        res.data
-      );
+        // ================= CHECK LAB TESTS =================
+        if (!hasLabTests) {
 
-      // ================= GET DATA =================
-      const predictionData = res.data.data;
+          alert(
+            "No lab test found. Please visit a trusted medical lab first."
+          );
 
-      console.log(
-        "PREDICTION DATA => ",
-        predictionData
-      );
+          setLoading(false);
 
-      // ================= SAVE =================
-      localStorage.setItem(
-        "prediction",
-        JSON.stringify(predictionData)
-      );
+          return;
+        }
 
-      setResult(predictionData);
+        // ================= START PREDICTION =================
+        const res = await axios.post(
 
-      // ================= NAVIGATE =================
-      if (predictionData.probability < 70) {
+          "http://localhost:5000/api/predictions/start",
 
-        navigate("/have-no-risk");
+          {},
 
-      } else {
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
 
-        navigate("/have-risk");
+        );
+
+        console.log(
+          "FULL RESPONSE => ",
+          res.data
+        );
+
+        const predictionData =
+          res.data.data;
+
+        console.log(
+          "PREDICTION DATA => ",
+          predictionData
+        );
+
+        // ================= SAVE =================
+        localStorage.setItem(
+          "prediction",
+          JSON.stringify(
+            predictionData
+          )
+        );
+
+        localStorage.setItem(
+          "prediction_id",
+          predictionData.prediction_id
+        );
+
+        setResult(
+          predictionData
+        );
+
+        // ================= NAVIGATE =================
+        if (
+          predictionData.probability < 70
+        ) {
+
+
+          navigate(
+            "/have-no-risk"
+          );
+
+        } else {
+
+          navigate(
+            "/have-risk"
+          );
+        }
+
+      } catch (err) {
+
+        console.log(err);
+
+        alert(
+
+          err.response?.data?.message ||
+
+          "Prediction Failed"
+
+        );
+
+      } finally {
+
+        setLoading(false);
+
       }
+    };
 
-    } catch (err) {
-
-      console.log(err);
-
-      alert(
-        err.response?.data?.message ||
-        "Prediction Failed"
-      );
-
-    } finally {
-
-      setLoading(false);
-    }
-  };
+    
 
   // ================= LOADING =================
   if (loading) {
@@ -198,7 +254,7 @@ const Prediction = () => {
         <div className="prediction-card">
 
           <h2>
-            Loading Prediction...
+            Loading...
           </h2>
 
         </div>
@@ -230,56 +286,12 @@ const Prediction = () => {
 
         </p>
 
-        {/* ================= CSV SECTION ================= */}
-        <div className="upload-section">
-
-          <div className="custom-file-upload">
-
-            <label
-              htmlFor="csvUpload"
-              className="file-label"
-            >
-
-              <FaFileCsv className="csv-icon" />
-
-              <span>
-
-                {csvFile
-                  ? csvFile.name
-                  : "Choose CSV File"}
-
-              </span>
-
-            </label>
-
-            <input
-              id="csvUpload"
-              type="file"
-              accept=".csv"
-              onChange={(e) =>
-                setCsvFile(e.target.files[0])
-              }
-            />
-
-          </div>
-
-          <button
-            onClick={handleUploadCSV}
-            className="btn upload-btn"
-          >
-
-            Upload CSV
-
-          </button>
-
-        </div>
-
         {/* ================= BUTTONS ================= */}
         <div className="prediction-buttons">
 
           <button
             onClick={handleStartPrediction}
-            className="btn custom-btn px-4 py-2 rounded-pill me-3"
+            className="btn start"
           >
 
             Start Prediction →
@@ -288,7 +300,7 @@ const Prediction = () => {
 
           <Link
             to="/learnmore"
-            className="btn learn btn-outline-dark rounded-pill"
+            className="btn learn"
           >
 
             Learn More →
@@ -306,7 +318,7 @@ const Prediction = () => {
 
           <span className="highlight">
 
-            if the percentage is higher than 70%
+            If the percentage is higher than 70%
             it means you have Heart Diseases
 
           </span>
@@ -317,17 +329,19 @@ const Prediction = () => {
 
           <h4>
 
-            {result?.probability
+            {result?.probability != null
               ? `${result.probability}%`
-              : "You Don't Have Data"}
+              : "No Prediction Yet"}
 
           </h4>
 
           <span>
 
             {result
-              ? "Prediction Completed Successfully"
-              : "Or The Lab Doesn't Finish The Report File"}
+              ? result.decision_label
+              : hasLabTests
+              ? "Ready To Start Prediction"
+              : "Please Visit A Trusted Lab First"}
 
           </span>
 
@@ -335,8 +349,11 @@ const Prediction = () => {
 
         <p className="info-text">
 
-          You Should Go To Trusted Medical Labs
-          So You Can Start Prediction
+          {hasLabTests
+
+            ? "Your Lab Results Are Ready For Prediction"
+
+            : "You Should Go To Trusted Medical Labs So They Can Upload Your Results"}
 
         </p>
 
@@ -371,12 +388,16 @@ const Prediction = () => {
 
                 href={
                   userLocation
+
                     ? `https://www.google.com/maps/dir/${userLocation.lat},${userLocation.lng}/${encodeURIComponent(lab.address)}`
+
                     : `https://www.google.com/maps/search/${encodeURIComponent(lab.address)}`
                 }
 
                 target="_blank"
+
                 rel="noopener noreferrer"
+
                 className="lab-card"
               >
 
@@ -403,8 +424,6 @@ const Prediction = () => {
                       {lab.address}
 
                     </p>
-
-                   
 
                   </div>
 

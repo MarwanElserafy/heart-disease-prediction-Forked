@@ -4,7 +4,7 @@ import "./Login.css";
 import heartImg from "../../assets/heartLog.png";
 import logo from "../../assets/Logo.png";
 
-import { FaUser, FaLock } from "react-icons/fa";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 
 import axios from "axios";
@@ -203,7 +203,7 @@ const Login = () => {
                 onBlur={handleBlur}
               />
 
-              <FaUser className="input-icon" />
+              <FaEnvelope className="input-icon" />
 
               {errors.email && (
 

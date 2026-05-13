@@ -4,18 +4,24 @@ import "../Pages/Have_no_risk.css";
 
 import { Link, useNavigate } from "react-router-dom";
 
+import {
+  FaCheckCircle,
+} from "react-icons/fa";
+
 function Home() {
 
-  const [prediction, setPrediction] = useState(null);
+  const [prediction, setPrediction] =
+    useState(null);
 
   const navigate = useNavigate();
 
   // ================= GET PREDICTION =================
   useEffect(() => {
 
-    const token = localStorage.getItem("token");
+    const token =
+      localStorage.getItem("token");
 
-    // PROTECT PAGE
+    // ================= PROTECT PAGE =================
     if (!token) {
 
       navigate("/login");
@@ -23,14 +29,29 @@ function Home() {
       return;
     }
 
-    const savedPrediction = localStorage.getItem("prediction");
+    const savedPrediction =
+      localStorage.getItem("prediction");
 
-    if (savedPrediction) {
+    // ================= NO PREDICTION =================
+    if (!savedPrediction) {
 
-      setPrediction(
-        JSON.parse(savedPrediction)
-      );
+      navigate("/prediction");
 
+      return;
+    }
+
+    // ================= GET SAVED DATA =================
+    const parsedPrediction =
+      JSON.parse(savedPrediction);
+
+    setPrediction(parsedPrediction);
+
+    // ================= REDIRECT IF RISK EXISTS =================
+    if (
+      parsedPrediction?.probability >= 70
+    ) {
+
+      navigate("/have-risk");
     }
 
   }, [navigate]);
@@ -39,7 +60,7 @@ function Home() {
 
     <div className="home-page">
 
-      {/* Hero Section */}
+      {/* ================= HERO SECTION ================= */}
       <section className="hero text-center">
 
         <h2 className="hero-title">
@@ -59,7 +80,9 @@ function Home() {
           <Link to="/prediction">
 
             <button className="btn custom-btn px-4 py-2 rounded-pill me-3">
+
               Start Prediction →
+
             </button>
 
           </Link>
@@ -68,76 +91,95 @@ function Home() {
             to="/learnmore"
             className="btn learn btn-outline-dark rounded-pill"
           >
+
             Learn More →
+
           </Link>
 
         </div>
 
       </section>
 
-      {/* Result Section */}
+      {/* ================= RESULT SECTION ================= */}
       <section className="result-section text-center">
 
         <h3 className="title-result">
-          The Percentage That You Have Heart Diseases Or Not
+
+          Your Heart Health Result
+
         </h3>
 
         <p className="result-note_">
-          If The Percentage Is Higher Than 70%
-          It Means You Have Heart Diseases
+
+          Your heart condition appears healthy
+          based on the AI prediction analysis.
+
         </p>
 
         <div className="result-card mx-auto">
 
           <p className="result-label">
-            The Percentage Is :
+
+            Your Heart Disease Risk :
+
           </p>
 
+          {/* ================= PERCENTAGE ================= */}
           <h2 className="result-value_">
 
-            {prediction?.probability
+            {prediction?.probability != null
               ? `${prediction.probability}%`
               : "0%"}
 
           </h2>
 
-          <p className="result-status">
+          {/* ================= STATUS ================= */}
+          <p className="result-status healthy-status">
 
-            {prediction?.probability < 70
-              ? "You Are Ok ❤️"
-              : "You Have Risk ⚠️"}
+            <FaCheckCircle />
+
+            You Are Healthy ❤️
 
           </p>
 
-          {/* STATUS */}
-          {prediction?.status && (
+        </div>
 
-            <p className="mt-2">
+        {/* ================= HEALTH TIPS ================= */}
+        <div className="tips-container">
 
-              Status :
-              {" "}
-              <strong>
-                {prediction.status}
-              </strong>
+          <h3 className="tips-title">
 
-            </p>
+            Healthy Lifestyle Tips
 
-          )}
+          </h3>
 
-          {/* MOST AFFECTED FACTOR */}
-          {prediction?.most_affected_factor && (
+          <div className="tips-grid">
 
-            <p>
+            <div className="tip-card">
 
-              Most Affected Factor :
-              {" "}
-              <strong>
-                {prediction.most_affected_factor}
-              </strong>
+              🥗 Eat healthy food rich in vegetables and fruits
 
-            </p>
+            </div>
 
-          )}
+            <div className="tip-card">
+
+              🏃 Exercise regularly for at least 30 minutes daily
+
+            </div>
+
+            <div className="tip-card">
+
+              💧 Drink enough water every day
+
+            </div>
+
+            <div className="tip-card">
+
+              😴 Maintain good sleep habits and reduce stress
+
+            </div>
+
+          </div>
 
         </div>
 
