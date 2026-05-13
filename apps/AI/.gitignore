@@ -1,0 +1,9 @@
+.env
+apps/AI/.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+ENV/

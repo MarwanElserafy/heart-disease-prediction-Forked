@@ -1,0 +1,68 @@
+.footer {
+  margin-top: 60px;
+  background-color: #77bac5;
+  color: #fff;
+  text-align: center;
+  padding: 15px;
+  border-top-left-radius: 30px; /* حافة فوق يسار مستديرة */
+  border-top-right-radius: 30px; /* حافة فوق يمين مستديرة */
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1); /* optional: يخلي الفوتر يبرز */
+  margin-top: 60px;
+  margin: 10px;
+  padding: 40px 0 20px;
+} /* Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+.btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.footer-text {
+  font-size: 14px;
+  opacity: 0.9;
+  color: #21444b;
+  margin-top: 15px;
+}
+.footer-title {
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #21444b;
+}
+.footer-list {
+  list-style: none;
+  padding: 0;
+  font-size: 14px;
+}
+.footer-list li {
+  margin-bottom: 8px;
+  cursor: pointer;
+  opacity: 0.9;
+  color: #21444b;
+  margin-bottom: 15px;
+}
+.footer-list li:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+.social-icons i {
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #21444b;
+}
+.social-icons i:hover {
+  transform: scale(1.15);
+}
+.footer-line {
+  border-color: rgba(255, 255, 255, 0.3);
+  margin: 25px 0 15px;
+}
+.copyright {
+  font-size: 13px;
+  opacity: 0.85;
+  color: #21444b;
+}
