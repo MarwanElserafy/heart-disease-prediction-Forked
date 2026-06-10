@@ -52,6 +52,7 @@ export default function App() {
   <Route path="/login" element={<Login />} />
   <Route path="/register" element={<Register />} />
   <Route path="/lab-portal" element={<LabPortal />} />
+  <Route path="/learnmore" element={<Learnmore />} />
 
   {/* PROTECTED ROUTES */}
   <Route
@@ -104,15 +105,6 @@ export default function App() {
     element={
       <ProtectedRoute>
         <Profile />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/learnmore"
-    element={
-      <ProtectedRoute>
-        <Learnmore />
       </ProtectedRoute>
     }
   />

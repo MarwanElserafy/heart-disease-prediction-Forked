@@ -18,9 +18,15 @@ __pycache__/
 venv/
 ENV/
 
-# Editors
+# Editors / IDE
 .vscode/
 .idea/
+.cursor/
+
+# Logs and temp files
+*.log
+debug.log
+body_*.txt
 
 # Images / uploads
 /images

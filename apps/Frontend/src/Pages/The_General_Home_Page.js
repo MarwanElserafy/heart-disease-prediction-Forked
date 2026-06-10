@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../Pages/The_General_Home_Page.css";
-import "../fontawesome-free-7.0.0-web/css/all.min.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import nabd from "../Image/nabd.png";
 import heart_icons from "../Image/heart_icons.png";
 import Box from "../Image/Box.png";
