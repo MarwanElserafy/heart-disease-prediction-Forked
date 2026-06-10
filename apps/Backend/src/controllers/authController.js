@@ -73,7 +73,12 @@ const loginUser = async (req, res, next) => {
     const { username, password } = req.body;
 
     const user = await prisma.user.findFirst({
-      where: { username },
+      where: {
+        username: {
+          equals: username.trim(),
+          mode: "insensitive",
+        },
+      },
     });
 
     if (!user) {
