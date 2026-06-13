@@ -1,0 +1,105 @@
+const { z } = require("zod");
+
+// z.coerce.number() يقبل أرقام مرسلة كـ string أو number من JSON
+const featuresSchema = z.object({
+  age: z.coerce
+    .number({ invalid_type_error: "Age must be a number" })
+    .int("Age must be an integer")
+    .min(0, "Age must be at least 0")
+    .max(120, "Age must not exceed 120"),
+
+  sex: z.coerce
+    .number({ invalid_type_error: "Sex must be a number" })
+    .int("Sex must be 0 or 1")
+    .min(0, "Sex must be 0 or 1")
+    .max(1, "Sex must be 0 or 1"),
+
+  chest_pain_type: z.coerce
+    .number({ invalid_type_error: "Chest pain type must be a number" })
+    .int("Chest pain type must be an integer")
+    .min(1, "Chest pain type must be between 1 and 4")
+    .max(4, "Chest pain type must be between 1 and 4"),
+
+  resting_bp_s: z.coerce
+    .number({ invalid_type_error: "Resting blood pressure must be a number" })
+    .min(80, "Resting blood pressure must be between 80 and 220")
+    .max(220, "Resting blood pressure must be between 80 and 220"),
+
+  cholesterol: z.coerce
+    .number({ invalid_type_error: "Cholesterol must be a number" })
+    .min(100, "Cholesterol must be between 100 and 600")
+    .max(600, "Cholesterol must be between 100 and 600"),
+
+  fasting_blood_sugar: z.coerce
+    .number({ invalid_type_error: "Fasting blood sugar must be a number" })
+    .int("Fasting blood sugar must be 0 or 1")
+    .min(0, "Fasting blood sugar must be 0 or 1")
+    .max(1, "Fasting blood sugar must be 0 or 1"),
+
+  resting_ecg: z.coerce
+    .number({ invalid_type_error: "Resting ECG must be a number" })
+    .int("Resting ECG must be an integer")
+    .min(0, "Resting ECG must be between 0 and 2")
+    .max(2, "Resting ECG must be between 0 and 2"),
+
+  max_heart_rate: z.coerce
+    .number({ invalid_type_error: "Max heart rate must be a number" })
+    .int("Max heart rate must be an integer")
+    .min(60, "Max heart rate must be between 60 and 220")
+    .max(220, "Max heart rate must be between 60 and 220"),
+
+  exercise_angina: z.coerce
+    .number({ invalid_type_error: "Exercise angina must be a number" })
+    .int("Exercise angina must be 0 or 1")
+    .min(0, "Exercise angina must be 0 or 1")
+    .max(1, "Exercise angina must be 0 or 1"),
+
+  oldpeak: z.coerce
+    .number({ invalid_type_error: "Oldpeak must be a number" })
+    .min(0, "Oldpeak must be between 0 and 10")
+    .max(10, "Oldpeak must be between 0 and 10"),
+
+  st_slope: z.coerce
+    .number({ invalid_type_error: "ST slope must be a number" })
+    .int("ST slope must be an integer")
+    .min(0, "ST slope must be between 0 and 2")
+    .max(2, "ST slope must be between 0 and 2"),
+});
+
+// Lab Test Create Schema — lab_id هو cuid (string) مش MongoDB ObjectId
+const labTestCreateSchema = z.object({
+  body: z.object({
+    lab_id: z
+      .string({ required_error: "Lab ID is required" })
+      .min(1, "Lab ID is required"),
+
+    national_id: z
+      .string({ required_error: "National ID is required" })
+      .length(14, "National ID must be exactly 14 digits")
+      .regex(/^\d{14}$/, "National ID must contain only digits"),
+
+    features: featuresSchema,
+  }).strict(),
+});
+
+// Lab Test Update Schema (all fields optional)
+const labTestUpdateSchema = z.object({
+  body: z.object({
+    lab_id: z.string().min(1, "Lab ID is required").optional(),
+
+    national_id: z
+      .string()
+      .length(14, "National ID must be exactly 14 digits")
+      .regex(/^\d{14}$/, "National ID must contain only digits")
+      .optional(),
+
+    features: featuresSchema.partial().optional(),
+  }).strict(),
+});
+
+// Prediction Update Schema (Removed as it is no longer used)
+
+module.exports = {
+  labTestCreateSchema,
+  labTestUpdateSchema,
+};

@@ -1,0 +1,289 @@
+/* ===== GLOBAL ===== */
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  background: transparent;
+}
+
+/* ===== PAGE ===== */
+
+.register-page{
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== CARD ===== */
+
+.register-card{
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  gap: 8px;
+
+  background: linear-gradient(135deg, #1198B7, #0f7f99);
+
+  overflow: hidden;
+}
+
+/* ===== LEFT IMAGE SIDE ===== */
+
+.register-image-side{
+  width: 35%;
+
+  background-size: cover;
+  background-position: center;
+
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+
+  padding: 25px;
+  border-radius: 10px;
+}
+
+/* ===== BRAND ===== */
+
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand h1{
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f4c5c;
+}
+
+.brand-logo{
+  width: 50px;
+}
+
+/* ===== RIGHT FORM SIDE ===== */
+
+.register-form-side{
+  width: 65%;
+
+  background: linear-gradient(135deg, #f5f8fc, #edf2f7);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+  border-radius: 10px;
+}
+
+/* light blur effect */
+.register-form-side::before{
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background: radial-gradient(
+    circle at top right,
+    rgba(17,152,183,0.18),
+    transparent 45%
+  );
+}
+
+/* ===== FORM ===== */
+
+.form-content{
+  width: 320px;
+  position: relative;
+  z-index: 2;
+}
+
+.form-content h2{
+  text-align: center;
+
+  color: #21596a;
+
+  font-size: 28px;
+  font-weight: 700;
+
+  margin-bottom: 35px;
+}
+
+/* ===== INPUT ===== */
+
+.input-group{
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.input-group input{
+  width: 100%;
+  height: 42px;
+
+  border: 1px solid #9aa8b1;
+  border-radius: 6px;
+
+  padding: 0 40px 0 14px;
+
+  background: transparent;
+
+  outline: none;
+
+  font-size: 14px;
+}
+
+.input-group input:focus{
+  border-color: #1198B7;
+}
+
+.input-icon{
+  position: absolute;
+
+  right: 14px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #50636d;
+  font-size: 14px;
+}
+
+.toggle-visibility-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-visibility-btn:hover {
+  color: #1198B7;
+}
+
+/* ===== BUTTON ===== */
+
+.create-btn{
+  width: 100%;
+  height: 42px;
+
+  border: none;
+  border-radius: 6px;
+
+  margin-top: 10px;
+
+  background: linear-gradient(90deg, #33b7d3, #1198B7);
+
+  color: white;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.create-btn:hover{
+  transform: translateY(-1px);
+}
+
+/* ===== LOGIN ===== */
+
+.login-text{
+  margin-top: 14px;
+
+  text-align: center;
+
+  font-size: 13px;
+  color: #6d6d6d;
+}
+
+.login-text a{
+  color: #1198B7;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* ===== ERROR ===== */
+
+.error-text{
+  font-size: 12px;
+  color: #e74c3c;
+  margin-top: 4px;
+  display: block;
+}
+
+.error-border input{
+  border: 1px solid #e74c3c !important;
+}
+
+.api-error{
+  background: #ffe5e5;
+  color: #c0392b;
+
+  padding: 10px 12px;
+  border-radius: 6px;
+
+  font-size: 13px;
+  margin-bottom: 15px;
+
+  border-left: 4px solid #e74c3c;
+}
+
+/* ===== ANIMATION ===== */
+
+@keyframes fadeIn{
+  from{
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 950px){
+
+  .register-card{
+    width: 100%;
+    height: auto;
+
+    flex-direction: column;
+  }
+
+  .register-image-side{
+    width: 100%;
+    height: 260px;
+  }
+
+  .register-form-side{
+    width: 100%;
+    padding: 50px 20px;
+  }
+
+  .page-title{
+    font-size: 30px;
+  }
+}
