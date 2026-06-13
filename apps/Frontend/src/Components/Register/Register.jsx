@@ -106,6 +106,9 @@ const Register = () => {
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
+      if (res.data.refreshToken) {
+        localStorage.setItem("refreshToken", res.data.refreshToken);
+      }
 
       setErrors({});
       navigate("/login");
