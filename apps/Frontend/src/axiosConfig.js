@@ -1,4 +1,6 @@
 import axios from "axios";
+import API_BASE_URL from "./config";
+
 
 // Add a request interceptor to automatically attach the access token
 axios.interceptors.request.use(
@@ -64,7 +66,7 @@ axios.interceptors.response.use(
       }
 
       try {
-        const res = await axios.post("http://localhost:5000/api/auth/refresh", {
+        const res = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
           refreshToken,
         });
 

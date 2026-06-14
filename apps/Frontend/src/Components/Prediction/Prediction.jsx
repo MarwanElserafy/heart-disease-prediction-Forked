@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 import axios from "axios";
+import API_BASE_URL from "../../config";
+
 
 import "./Prediction.css";
 
@@ -67,7 +69,7 @@ const Prediction = () => {
     try {
 
       const res = await axios.get(
-        "http://localhost:5000/api/labs"
+        `${API_BASE_URL}/api/labs`
       );
 
       console.log(
@@ -98,7 +100,7 @@ const Prediction = () => {
 
       const res = await axios.get(
 
-        "http://localhost:5000/api/labtests/me/status",
+        `${API_BASE_URL}/api/labtests/me/status`,
 
         {
           headers: {
@@ -163,7 +165,7 @@ const Prediction = () => {
         // ================= START PREDICTION =================
         const res = await axios.post(
 
-          "http://localhost:5000/api/predictions/start",
+          `${API_BASE_URL}/api/predictions/start`,
 
           {},
 

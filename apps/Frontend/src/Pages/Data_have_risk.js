@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "../config";
+
 
 import "../Pages/Data_have_risk.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -90,7 +92,7 @@ function Home() {
         localStorage.getItem("token");
 
       const res = await axios.get(
-        `http://localhost:5000/api/predictions/${predictionId}/shap`,
+        `${API_BASE_URL}/api/predictions/${predictionId}/shap`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -118,7 +120,7 @@ function Home() {
 
       // ================= GET ALL HOSPITALS =================
       const hospitalsRes = await axios.get(
-        `http://localhost:5000/api/hospitals?limit=100`
+        `${API_BASE_URL}/api/hospitals?limit=100`
       );
 
       const allHospitals = hospitalsRes.data.data;
@@ -163,7 +165,7 @@ function Home() {
         }
 
         const res = await axios.get(
-          `http://localhost:5000/api/predictions/${predictionId}/report`,
+          `${API_BASE_URL}/api/predictions/${predictionId}/report`,
           {
             headers: {
               Authorization:

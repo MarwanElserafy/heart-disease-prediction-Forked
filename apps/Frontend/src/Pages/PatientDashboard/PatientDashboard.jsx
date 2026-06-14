@@ -20,8 +20,9 @@ import {
 
 import "./PatientDashboard.css";
 import defaultProfile from "../../Image/prof.png";
+import API_BASE_URL from "../../config";
 
-const API = "http://localhost:5000/api";
+const API = `${API_BASE_URL}/api`;
 const PAGE_SIZE = 5;
 const CONTACT_KEY = "patientProfile_contact";
 

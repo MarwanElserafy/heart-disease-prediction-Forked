@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 // import { FaCheckCircle } from "react-icons/fa";
 import "../Prediction/Prediction.css";
 import "./EcgPrediction.css";
+import API_BASE_URL from "../../config";
 
-const API = "http://localhost:5000/api";
+const API = `${API_BASE_URL}/api`;
 
 export default function EcgPrediction() {
   const navigate = useNavigate();

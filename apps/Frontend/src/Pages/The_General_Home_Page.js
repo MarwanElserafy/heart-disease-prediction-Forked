@@ -23,7 +23,7 @@ function Home() {
       }
 
       // Check lab status
-      const statusRes = await axios.get("http://localhost:5000/api/labtests/me/status", {
+      const statusRes = await axios.get(`${API_BASE_URL}/api/labtests/me/status`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -34,7 +34,7 @@ function Home() {
       }
 
       // Has Data -> start prediction
-      const predRes = await axios.post("http://localhost:5000/api/predictions/start", {}, {
+      const predRes = await axios.post(`${API_BASE_URL}/api/predictions/start`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -64,7 +64,7 @@ function Home() {
         alert("Please Login First");
         return;
       }
-      const statusRes = await axios.get("http://localhost:5000/api/ecg/me/status", {
+      const statusRes = await axios.get(`${API_BASE_URL}/api/ecg/me/status`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!statusRes.data.data.hasEcgTests) {
@@ -72,7 +72,7 @@ function Home() {
         return;
       }
       const predRes = await axios.post(
-        "http://localhost:5000/api/ecg/start",
+        `${API_BASE_URL}/api/ecg/start`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
