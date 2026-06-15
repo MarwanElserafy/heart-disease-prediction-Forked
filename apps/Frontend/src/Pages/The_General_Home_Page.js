@@ -6,6 +6,7 @@ import heart_icons from "../Image/heart_icons.png";
 import Box from "../Image/Box.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 function Home() {
   const navigate = useNavigate();
