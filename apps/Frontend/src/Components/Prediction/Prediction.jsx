@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from "react";
 
 import axios from "axios";
+<<<<<<< HEAD
 
 import "./Prediction.css";
 import API_BASE_URL from "../../config";
+=======
+import API_BASE_URL from "../../config";
+
+
+import "./Prediction.css";
+>>>>>>> main
 
 import {
   Link,
@@ -98,6 +105,10 @@ const Prediction = () => {
       if (!token) return;
 
       const res = await axios.get(
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
         `${API_BASE_URL}/api/labtests/me/status`,
 
         {
@@ -162,6 +173,10 @@ const Prediction = () => {
 
         // ================= START PREDICTION =================
         const res = await axios.post(
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
           `${API_BASE_URL}/api/predictions/start`,
 
           {},
