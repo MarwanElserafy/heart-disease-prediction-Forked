@@ -3,6 +3,10 @@ import axios from "axios";
 import "./Register.css";
 import API_BASE_URL from "../../config";
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 import heartImg from "../../assets/heart.png";
 import logo from "../../assets/Logo.png";
 
@@ -107,6 +111,12 @@ const Register = () => {
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
+<<<<<<< HEAD
+=======
+      if (res.data.refreshToken) {
+        localStorage.setItem("refreshToken", res.data.refreshToken);
+      }
+>>>>>>> main
 
       setErrors({});
       navigate("/login");
